@@ -21,11 +21,11 @@ class top_carbon: public sc_module
         mod_sch  *sch_mod;
         mod_pe   *pe_mod;
         mod_egr  *egr_mod;
-        vector<sc_in<pkt_desc> *>   in_ing_port;  //用于透传连线ing的输入端口信号,在顶层连接发包器
-        vector<sc_out<pkt_desc> *>  out_egr_port; //用于透传连线egr的输出端口信号,在顶层连接stat
-        sc_signal<pkt_desc>         ing_sch_sig;  //用于连接ing和sch  
-        sc_signal<pkt_desc>         sch_pe_sig;  //用于连接ing和sch  
-        sc_signal<pkt_desc>         pe_egr_sig;  //用于连接ing和sch           
+        array<sc_in<s_pkt_desc> *, g_inter_num>   in_ing_port;  //用于透传连线ing的输入端口信号,在顶层连接发包器
+        array<sc_out<s_pkt_desc> *,g_inter_num>  out_egr_port; //用于透传连线egr的输出端口信号,在顶层连接stat
+        sc_signal<s_pkt_desc>         ing_sch_sig;  //用于连接ing和sch  
+        sc_signal<s_pkt_desc>         sch_pe_sig;  //用于连接ing和sch  
+        sc_signal<s_pkt_desc>         pe_egr_sig;  //用于连接ing和sch           
   
     public: //例化及互联部分
         top_carbon(sc_module_name name):sc_module(name)
@@ -36,12 +36,10 @@ class top_carbon: public sc_module
             pe_mod = new mod_pe("mod_pe");
             egr_mod= new mod_egr("mod_egr");
             
-            in_ing_port.resize(g_m_inter_num);
-            out_egr_port.resize(g_m_inter_num);
-            for(int i =0; i < g_m_inter_num; i++)
+            for(int i =0; i < g_inter_num; i++)
             {
-                in_ing_port[i] = new sc_in<pkt_desc>(); 
-                out_egr_port[i] = new sc_out<pkt_desc>(); 
+                in_ing_port[i] = new sc_in<s_pkt_desc>(); 
+                out_egr_port[i] = new sc_out<s_pkt_desc>(); 
                 
             }
 
@@ -56,7 +54,7 @@ class top_carbon: public sc_module
             egr_mod->in_port(pe_egr_sig);     //绑定pe和egr
 
             //ing的入口和egr的出口，连线透传到顶层，待更高层进行连接
-            for(int i =0; i < g_m_inter_num; i++)
+            for(int i =0; i < g_inter_num; i++)
             {
                 ing_mod->in_port[i]->bind(*in_ing_port[i]);
                 egr_mod->out_port[i]->bind(*out_egr_port[i]);

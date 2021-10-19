@@ -10,12 +10,11 @@
 ////////////////////////////////////////////////////////
 mod_ing::mod_ing(sc_module_name name):sc_module(name)
 {
-    in_port.resize(g_m_inter_num);
-    for(int i =0; i < g_m_inter_num; i++)
+    for(int i =0; i < g_inter_num; i++)
     {
-        in_port[i] = new sc_in<pkt_desc>();
+        in_port[i] = new sc_in<s_pkt_desc>();
     }
-
+    SC_METHOD(recv_cell_from_tb);
 }
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
@@ -28,5 +27,6 @@ mod_ing::mod_ing(sc_module_name name):sc_module(name)
 ////////////////////////////////////////////////////////
 void mod_ing::recv_cell_from_tb()
 { 
+   
 
 }
