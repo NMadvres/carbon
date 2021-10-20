@@ -20,10 +20,10 @@ using namespace std;
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-const int g_m_freq  = 100; //100M HZ
-const int g_m_inter_num =6;
+const int g_freq  = 100; //100M HZ
+const int g_inter_num =6;
 
-struct pkt_desc
+struct s_pkt_desc
 {
    int  type;  //0 packet 1 cell
    int  fid;   //flow id，对应Flow号，和激励对应
@@ -39,7 +39,7 @@ struct pkt_desc
    int  csn;   //cell切片号， 只有cell状态下有意义
    int  sop;   //首切片，只有cell状态下有意义
    int  eop;   //尾切片，只有cell状态下有意义
-   pkt_desc()
+   s_pkt_desc()
    {
       type =-1;
       fid  =-1;
@@ -57,7 +57,7 @@ struct pkt_desc
       eop     =-1;
    }
 
-   inline bool operator == (const pkt_desc& rhs) const
+   inline bool operator == (const s_pkt_desc& rhs) const
    {
      return (rhs.type == type && rhs.fid == fid && rhs.sid == sid && rhs.did == did && rhs.fsn == fsn && \
      rhs.len == len && rhs.pri == pri && rhs.sport == sport && rhs.dport == dport && rhs.qid == qid && rhs.vldl == vldl && \
@@ -65,19 +65,19 @@ struct pkt_desc
    } 
 }; 
 
-inline  ostream& operator << ( ostream& os, const pkt_desc& /* a */ )
+inline  ostream& operator << ( ostream& os, const s_pkt_desc& /* a */ )
 {
     os << "streaming of struct pkt not implemented";
     return os;
 }
 
-inline void  sc_trace( sc_trace_file* tf, const pkt_desc& a, const std::string& name )
+inline void  sc_trace( sc_trace_file* tf, const s_pkt_desc& a, const std::string& name )
 {
     sc_trace( tf, a.sport, name + ".data" );
 }
 
 // fid映射规则表内容
-struct flow_rule_s
+struct s_flow_rule
 {
    int sid;
    int did;
@@ -88,7 +88,7 @@ struct flow_rule_s
    int qid;
    int len2add;
    int flow_speed;
-   flow_rule_s()
+   s_flow_rule()
    {
       sid =-1;
       did =-1;
@@ -104,32 +104,59 @@ struct flow_rule_s
 
 
 //hash规则表KEY值
-struct hash_rule_key_s
+struct s_hash_rule_key
 {
    int sid;
    int did;
    int pri;
-   hash_rule_key_s()
+   s_hash_rule_key()
    {
       sid =-1;
       did =-1;
       pri =-1;
    }
+
+   inline bool operator == (const s_hash_rule_key& rhs) const
+   {
+     return (rhs.sid == sid && rhs.did == did && rhs.pri == pri );
+   } 
+
+   inline bool operator < (const s_hash_rule_key& rhs) const
+   {
+     return !(rhs.sid == sid && rhs.did == did && rhs.pri == pri );
+   } 
 };
 
+//定义两个别名，用于que队列表和port端口表
+typedef int s_tab_que;
+typedef int s_tab_port;
+
 //fid映射规则表项,key fid,查表得到映射表
-extern map<int, flow_rule_s>  g_flow_rule_tab;
+extern vector<s_flow_rule>  g_flow_rule_tab;
 //Hash规则表项，查表得到fid号
-extern map<hash_rule_key_s, int>  g_hash_rule_tab;
+extern map<s_hash_rule_key, int>  g_hash_rule_tab;
 
 //que_rule规则表项，查表得到rr_weight号,key为qid号
-extern map<int, int>  g_que_rule_tab;
+extern vector<s_tab_que>  g_que_rule_tab;
 
 //port_rule规则表项，查表得到port_speed号,key为port号
-extern map<int, int>  g_port_rule_tab;
+extern vector<s_tab_port>  g_port_rule_tab;
 
+//产生全局时钟计数器
+extern int g_cycle_cnt;
+class mod_testcrtl_c: public sc_module
+{
+   public:
+   mod_testcrtl_c(sc_module_name name);
+   SC_HAS_PROCESS(mod_testcrtl_c);
+   sc_in_clk     clk;
+   void calc_cycle_cnt();
+};
+
+//产生全局配置
 class glb_cfg_c
 {
+   public:
    glb_cfg_c();
 };
 

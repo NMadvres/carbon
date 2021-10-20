@@ -17,7 +17,7 @@ class mod_ing: public sc_module
         SC_HAS_PROCESS(mod_ing);
         void  recv_cell_from_tb();
     public:
-        vector<sc_in<pkt_desc> *>   in_port;
-        sc_out<pkt_desc>            out_cell_que;
+        array<sc_in<s_pkt_desc> *,g_inter_num>   in_port;
+        sc_out<s_pkt_desc>            out_cell_que;
 };
 #endif

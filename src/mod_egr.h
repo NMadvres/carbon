@@ -16,7 +16,7 @@ class mod_egr: public sc_module
         mod_egr(sc_module_name name);
         SC_HAS_PROCESS(mod_egr);
     public:
-        sc_in<pkt_desc>              in_port;
-        vector<sc_out<pkt_desc> *>   out_port;
+        sc_in<s_pkt_desc>              in_port;
+        array<sc_out<s_pkt_desc> *, g_inter_num>   out_port;
 };
 #endif
