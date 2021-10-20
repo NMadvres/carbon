@@ -144,14 +144,6 @@ extern vector<s_tab_port>  g_port_rule_tab;
 
 //产生全局时钟计数器
 extern int g_cycle_cnt;
-class mod_testcrtl_c: public sc_module
-{
-   public:
-   mod_testcrtl_c(sc_module_name name);
-   SC_HAS_PROCESS(mod_testcrtl_c);
-   sc_in_clk     clk;
-   void calc_cycle_cnt();
-};
 
 //产生全局配置
 class glb_cfg_c

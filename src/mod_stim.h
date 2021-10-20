@@ -17,6 +17,8 @@ class mod_stim: public sc_module
         SC_HAS_PROCESS(mod_stim);
     public:
         array<sc_out<s_pkt_desc> *,g_inter_num>        out_pkt_ports;
+        sc_in<int>                    in_clk_cnt;  
+        void  process_gen_packet();
 };
 
 #endif

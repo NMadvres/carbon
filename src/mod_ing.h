@@ -19,5 +19,6 @@ class mod_ing: public sc_module
     public:
         array<sc_in<s_pkt_desc> *,g_inter_num>   in_port;
         sc_out<s_pkt_desc>            out_cell_que;
+        sc_in<int>                    in_clk_cnt;   
 };
 #endif

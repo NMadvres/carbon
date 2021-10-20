@@ -25,8 +25,9 @@ class top_carbon: public sc_module
         array<sc_out<s_pkt_desc> *,g_inter_num>  out_egr_port; //用于透传连线egr的输出端口信号,在顶层连接stat
         sc_signal<s_pkt_desc>         ing_sch_sig;  //用于连接ing和sch  
         sc_signal<s_pkt_desc>         sch_pe_sig;  //用于连接ing和sch  
-        sc_signal<s_pkt_desc>         pe_egr_sig;  //用于连接ing和sch           
-  
+        sc_signal<s_pkt_desc>         pe_egr_sig;  //用于连接ing和sch     
+        sc_in<int>                    in_clk_cnt;  //全局时钟计数，用于互联   
+     
     public: //例化及互联部分
         top_carbon(sc_module_name name):sc_module(name)
         {
@@ -59,9 +60,13 @@ class top_carbon: public sc_module
                 ing_mod->in_port[i]->bind(*in_ing_port[i]);
                 egr_mod->out_port[i]->bind(*out_egr_port[i]);
             }
-
+            //全局cnt互联
+            ing_mod->in_clk_cnt(in_clk_cnt);
+            sch_mod->in_clk_cnt(in_clk_cnt);
+            pe_mod->in_clk_cnt(in_clk_cnt);
+            egr_mod->in_clk_cnt(in_clk_cnt);
         }
-        SC_HAS_PROCESS(mod_ing);
+        SC_HAS_PROCESS(top_carbon);
 
 };
 #endif

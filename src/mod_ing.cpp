@@ -15,6 +15,8 @@ mod_ing::mod_ing(sc_module_name name):sc_module(name)
         in_port[i] = new sc_in<s_pkt_desc>();
     }
     SC_METHOD(recv_cell_from_tb);
+    sensitive << in_clk_cnt;
+    dont_initialize();
 }
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
@@ -27,6 +29,7 @@ mod_ing::mod_ing(sc_module_name name):sc_module(name)
 ////////////////////////////////////////////////////////
 void mod_ing::recv_cell_from_tb()
 { 
-   
+   int a;
+   a = in_clk_cnt.read();
 
 }

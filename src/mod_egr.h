@@ -18,5 +18,6 @@ class mod_egr: public sc_module
     public:
         sc_in<s_pkt_desc>              in_port;
         array<sc_out<s_pkt_desc> *, g_inter_num>   out_port;
+        sc_in<int>                    in_clk_cnt;  
 };
 #endif

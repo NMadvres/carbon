@@ -14,5 +14,12 @@ mod_stim::mod_stim(sc_module_name name):sc_module(name)
     {
         out_pkt_ports[i] = new sc_out<s_pkt_desc>();
     }
+    //敏感信号触发
+    SC_METHOD(process_gen_packet);
+    sensitive << in_clk_cnt;
+}
+
+void  mod_stim::process_gen_packet()
+{
 
 }
