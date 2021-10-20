@@ -4,7 +4,7 @@
 //Module: stim_mod.h
 //Description:  发包模块
 //Group: Nebula-Matrix 预研组
-//Author: Shawn
+//Author: John/Shawn
 //Hierarchy：内部无嵌套模块的功能模块
 ////////////////////////////////////////////////////////////
 

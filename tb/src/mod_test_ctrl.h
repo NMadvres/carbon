@@ -4,7 +4,7 @@
 //Module: function_module.h
 //Description:  底层功能模块
 //Group: Nebula-Matrix 预研组
-//Author: 张三
+//Author: Destin/Shawn
 //Hierarchy：内部无嵌套模块的功能模块
 ////////////////////////////////////////////////////////////
 
