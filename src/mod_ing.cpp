@@ -129,6 +129,8 @@ void mod_ing::pkt_to_cell_process()
     int cell_sn;
     s_pkt_desc cell_trans;
     cell_sn = 0;
+    // FIXME 临时编译修改
+    int cell_len = 0;
 
     if (pkt_tmp_len > 0) {
         while (pkt_tmp_len >= cell_len) {

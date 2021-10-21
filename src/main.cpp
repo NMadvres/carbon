@@ -22,8 +22,8 @@ int sc_main(int argc, char *argv[])
     top_carbon top_carbon_mod("top_carbon");
     top_tb top_tb_mod("top_tb");
     //顶层绑定
-    array<sc_signal<s_pkt_desc> *, g_inter_num> tb_ing_sig;
-    array<sc_signal<s_pkt_desc> *, g_inter_num> egr_tb_sig;
+    std::array<sc_signal<s_pkt_desc> *, g_inter_num> tb_ing_sig;
+    std::array<sc_signal<s_pkt_desc> *, g_inter_num> egr_tb_sig;
     for (int i = 0; i < g_inter_num; i++) {
         tb_ing_sig[i] = new sc_signal<s_pkt_desc>();
         egr_tb_sig[i] = new sc_signal<s_pkt_desc>();
