@@ -5,10 +5,16 @@
 // FIXME 临时编译修改
 // ----------------------------------------------------------------------------
 // #include "comm_func.h"
-struct RR_SCH {
-    RR_SCH(int) {}
-    void set_que_valid(int,bool) {}
-    bool get_sch_result(int) { return true; }
+struct RR_SCH
+{
+    RR_SCH(int)
+    {}
+    void set_que_valid(int, bool)
+    {}
+    bool get_sch_result(int)
+    {
+        return true;
+    }
 };
 // ----------------------------------------------------------------------------
 
