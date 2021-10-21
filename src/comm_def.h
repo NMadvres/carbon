@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include <memory>
 #include <string.h>
+#include <sstream>
 #include <array>
 #include <vector>
 #include <deque>
 #include <map>
+#include<unordered_map>
 #include <assert.h>
 #include "systemc.h"
 using namespace std;
@@ -21,7 +23,7 @@ using namespace std;
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
 const int g_freq  = 100; //100M HZ
-const int g_inter_num =6;
+const int g_inter_num =4;
 
 struct s_pkt_desc
 {
@@ -65,9 +67,22 @@ struct s_pkt_desc
    } 
 }; 
 
-inline  ostream& operator << ( ostream& os, const s_pkt_desc& /* a */ )
+inline  ostream& operator << ( ostream& os, const s_pkt_desc& a/* a */ )
 {
-    os << "streaming of struct pkt not implemented";
+    os << "type:" << a.type <<endl;
+    os << "fid:" << a.fid <<endl;
+    os << "sid:" << a.sid <<endl;
+    os << "did:" << a.did <<endl;
+    os << "fsn:" << a.fsn <<endl;
+    os << "len:" << a.len <<endl;
+    os << "pri:" << a.pri <<endl;
+    os << "sport:" << a.sport <<endl;
+    os << "dport:" << a.dport <<endl;
+    os << "qid:" << a.qid <<endl;
+    os << "vldl:" << a.vldl <<endl;
+    os << "csn:" << a.csn <<endl;
+    os << "sop:" << a.sop <<endl;
+    os << "eop:" << a.eop <<endl;
     return os;
 }
 
@@ -127,6 +142,14 @@ struct s_hash_rule_key
    } 
 };
 
+struct has_rule_key_hash
+{
+    std::size_t operator() (const s_hash_rule_key &key) const
+    {
+        return key.sid ^ key.did ^ key.pri;
+    }
+};
+
 //定义两个别名，用于que队列表和port端口表
 typedef int s_tab_que;
 typedef int s_tab_port;
@@ -134,7 +157,7 @@ typedef int s_tab_port;
 //fid映射规则表项,key fid,查表得到映射表
 extern vector<s_flow_rule>  g_flow_rule_tab;
 //Hash规则表项，查表得到fid号
-extern map<s_hash_rule_key, int>  g_hash_rule_tab;
+extern unordered_map<s_hash_rule_key,int,has_rule_key_hash> g_hash_rule_tab;
 
 //que_rule规则表项，查表得到rr_weight号,key为qid号
 extern vector<s_tab_que>  g_que_rule_tab;
@@ -149,7 +172,15 @@ extern int g_cycle_cnt;
 class glb_cfg_c
 {
    public:
-   glb_cfg_c();
+   glb_cfg_c(string file_name);
+   void read_cfg_file(string file_name);
+   void gen_cfg_table();
+   public:
+   vector<vector<int> >  g_flow_tab_relate;  //两维度；其中第一维是表项深度（包括key和value项），二维是index及value的横向展开
+   vector<vector<int> >  g_hash_tab_relate;  //两维度；其中第一维是表项深度（包括key和value项），二维是index及value的横向展开
+   vector<vector<int> >  g_que_tab_relate;  //两维度；其中第一维是表项深度（包括key和value项），二维是index及value的横向展开
+   vector<vector<int> >  g_port_tab_relate;  //两维度；其中第一维是表项深度（包括key和value项），二维是index及value的横向展开
+
 };
 
 
