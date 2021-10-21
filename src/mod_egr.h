@@ -1,6 +1,8 @@
 #ifndef __MOD_EGR_H__
 #define __MOD_EGR_H__
+
 #include "comm_def.h"
+
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_ing
@@ -18,7 +20,7 @@ public:
 
 public:
     sc_in<s_pkt_desc> in_port;
-    array<sc_out<s_pkt_desc> *, g_inter_num> out_port;
+    std::array<sc_out<s_pkt_desc> *, g_inter_num> out_port;
     sc_in<int> in_clk_cnt;
 };
-#endif
+#endif // __MOD_EGR_H__

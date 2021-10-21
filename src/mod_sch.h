@@ -1,6 +1,8 @@
 #ifndef __MOD_SCH_H__
 #define __MOD_SCH_H__
+
 #include "comm_def.h"
+
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_sch
@@ -22,4 +24,4 @@ public:
     sc_in<int> in_clk_cnt;
 };
 
-#endif
+#endif // __MOD_SCH_H__

@@ -100,14 +100,14 @@ void mod_ing::lut_process()
     s_did = s_port_sch_result.did;
     s_pri = s_port_sch_result.pri;
 
-    has_rule_key_s hash_pkt_lut_key;
+    s_hash_rule_key hash_pkt_lut_key;
 
     hash_pkt_lut_key.sid = s_sid;
     hash_pkt_lut_key.did = s_did;
     hash_pkt_lut_key.pri = s_pri;
 
     if (pkt_out_flag == 1) {
-        std::unordered_map<has_rule_key_s, int>::iterator iter = g_hash_rule_tab.find(hash_pkt_lut_key);
+        auto iter = g_hash_rule_tab.find(hash_pkt_lut_key);
         if (iter != g_hash_rule_tab.end()) {
             flow_id = iter->second;
 #ifdef mod_ing_print

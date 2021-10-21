@@ -2,7 +2,7 @@
 #include "systemc.h"
 #include "top_carbon.h"
 #include "top_tb.h"
-using namespace std;
+
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   main

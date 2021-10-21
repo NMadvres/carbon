@@ -1,6 +1,8 @@
 #ifndef __MOD_STIM_H__
 #define __MOD_STIM_H__
+
 #include "comm_def.h"
+
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_stim
@@ -22,4 +24,4 @@ public:
     void process_gen_packet();
 };
 
-#endif
+#endif // __MOD_STIM_H__

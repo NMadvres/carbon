@@ -1,5 +1,6 @@
 #ifndef __MOD_ING_H__
 #define __MOD_ING_H__
+
 #include "comm_def.h"
 #include "comm_func.h"
 
@@ -16,7 +17,7 @@ class mod_ing: public sc_module
 {
 public:
     sc_in<int> clkcnt;
-    array<sc_in<s_pkt_desc> *, g_inter_num> in_port;
+    std::array<sc_in<s_pkt_desc> *, g_inter_num> in_port;
     // output
     sc_out<s_pkt_desc> out_cell_que;
 
@@ -37,12 +38,12 @@ private:
     int pkt_out_flag = 0;
     s_flow_rule flow_rule;
 
-    array<deque<s_pkt_desc>, g_inter_num>
+    std::array<std::deque<s_pkt_desc>, g_inter_num>
         fifo_port;
-    array<int, g_inter_num> pkt_count_port;
-    array<int, g_inter_num> infifo_count_port;
-    array<int, g_inter_num> drop_count_port;
+    std::array<int, g_inter_num> pkt_count_port;
+    std::array<int, g_inter_num> infifo_count_port;
+    std::array<int, g_inter_num> drop_count_port;
 
     RR_SCH *rr_sch;
 };
-#endif
+#endif // __MOD_ING_H__
