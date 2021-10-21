@@ -12,13 +12,14 @@
 ////////////////////////////////////////////////////////
 class mod_pe: public sc_module
 {
-    public:    
-        mod_pe(sc_module_name name);
-        SC_HAS_PROCESS(mod_pe);
-    public:
-        sc_in<s_pkt_desc>             in_cell_que;
-        sc_out<s_pkt_desc>            out_cell_que;
-        sc_in<int>                    in_clk_cnt;  
+public:
+    mod_pe(sc_module_name name);
+    SC_HAS_PROCESS(mod_pe);
+
+public:
+    sc_in<s_pkt_desc> in_cell_que;
+    sc_out<s_pkt_desc> out_cell_que;
+    sc_in<int> in_clk_cnt;
 };
 
 #endif

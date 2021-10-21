@@ -12,7 +12,7 @@
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-class mod_ing : public sc_module
+class mod_ing: public sc_module
 {
 public:
     sc_in<int> clkcnt;
