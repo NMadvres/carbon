@@ -1,4 +1,5 @@
-#include"mod_stim.h"
+#include "mod_stim.h"
+
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_stim
@@ -8,10 +9,10 @@
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-mod_stim::mod_stim(sc_module_name name):sc_module(name)
-{ 
-    for(int i =0; i < g_inter_num; i++)
-    {
+mod_stim::mod_stim(sc_module_name name):
+    sc_module(name)
+{
+    for (int i = 0; i < g_inter_num; i++) {
         out_pkt_ports[i] = new sc_out<s_pkt_desc>();
     }
     //敏感信号触发
@@ -19,7 +20,6 @@ mod_stim::mod_stim(sc_module_name name):sc_module(name)
     sensitive << in_clk_cnt;
 }
 
-void  mod_stim::process_gen_packet()
+void mod_stim::process_gen_packet()
 {
-
 }

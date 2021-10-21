@@ -1,7 +1,22 @@
 #ifndef __MOD_ING_H__
 #define __MOD_ING_H__
+
 #include "comm_def.h"
-#include "comm_func.h"
+// FIXME 临时编译修改
+// ----------------------------------------------------------------------------
+// #include "comm_func.h"
+struct RR_SCH
+{
+    RR_SCH(int)
+    {}
+    void set_que_valid(int, bool)
+    {}
+    bool get_sch_result(int)
+    {
+        return true;
+    }
+};
+// ----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
@@ -12,11 +27,13 @@
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-class mod_ing : public sc_module
+class mod_ing: public sc_module
 {
 public:
     sc_in<int> clkcnt;
-    array<sc_in<s_pkt_desc> *, g_inter_num> in_port;
+    // FIXME 临时编译修改
+    sc_in<int> in_clk_cnt;
+    std::array<sc_in<s_pkt_desc> *, g_inter_num> in_port;
     // output
     sc_out<s_pkt_desc> out_cell_que;
 
@@ -37,12 +54,11 @@ private:
     int pkt_out_flag = 0;
     s_flow_rule flow_rule;
 
-    array<deque<s_pkt_desc>, g_inter_num>
-        fifo_port;
-    array<int, g_inter_num> pkt_count_port;
-    array<int, g_inter_num> infifo_count_port;
-    array<int, g_inter_num> drop_count_port;
+    std::array<std::deque<s_pkt_desc>, g_inter_num> fifo_port;
+    std::array<int, g_inter_num> pkt_count_port;
+    std::array<int, g_inter_num> infifo_count_port;
+    std::array<int, g_inter_num> drop_count_port;
 
     RR_SCH *rr_sch;
 };
-#endif
+#endif // __MOD_ING_H__

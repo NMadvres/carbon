@@ -1,6 +1,8 @@
 #ifndef __MOD_PE_H__
 #define __MOD_PE_H__
+
 #include "comm_def.h"
+
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_pe
@@ -12,13 +14,14 @@
 ////////////////////////////////////////////////////////
 class mod_pe: public sc_module
 {
-    public:    
-        mod_pe(sc_module_name name);
-        SC_HAS_PROCESS(mod_pe);
-    public:
-        sc_in<s_pkt_desc>             in_cell_que;
-        sc_out<s_pkt_desc>            out_cell_que;
-        sc_in<int>                    in_clk_cnt;  
+public:
+    mod_pe(sc_module_name name);
+    SC_HAS_PROCESS(mod_pe);
+
+public:
+    sc_in<s_pkt_desc> in_cell_que;
+    sc_out<s_pkt_desc> out_cell_que;
+    sc_in<int> in_clk_cnt;
 };
 
-#endif
+#endif // __MOD_PE_H__
