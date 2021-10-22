@@ -1,7 +1,7 @@
 #ifndef __MOD_STAT_H__
 #define __MOD_STAT_H__
 
-#include "comm_def.h"
+#include "../../src/comm_def.h"
 
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
@@ -14,12 +14,13 @@
 ////////////////////////////////////////////////////////
 class mod_stat: public sc_module
 {
-    public:    
-        mod_stat(sc_module_name name);
-        SC_HAS_PROCESS(mod_stat);
-    public:
-        array<sc_in<s_pkt_desc> *, g_inter_num>        in_pkt_stat;
-        sc_in<int>                                     in_clk_cnt;  
+public:
+    mod_stat(sc_module_name name);
+    SC_HAS_PROCESS(mod_stat);
+
+public:
+    array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_pkt_stat;
+    sc_in<int> in_clk_cnt;
 };
 
 #endif // __MOD_STAT_H__

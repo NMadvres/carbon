@@ -22,6 +22,16 @@ public:
     sc_in<s_pkt_desc> in_cell_que;
     sc_out<s_pkt_desc> out_cell_que;
     sc_in<int> in_clk_cnt;
+    vector<deque<s_pkt_desc>> input_cell_que;
+    vector<int> que_status;
+    WRR_SCH *wrr_sch;
+
+public:
+    void main_process();
+    void rev_pkt_process();
+    void sch_pkt_process();
+    void check_que_status(int que_id);
+    void send_cell_to_pe(int que_id);
 };
 
 #endif // __MOD_SCH_H__

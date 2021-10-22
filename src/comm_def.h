@@ -23,8 +23,9 @@ using namespace std;
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
 
-const int g_freq = 100; //100M HZ
-const int g_inter_num = 4;
+const int G_FREQ = 100; //100M HZ
+const int G_INTER_NUM = 4;
+const int G_QUE_NUM = 16;
 
 struct s_pkt_desc
 {
@@ -164,7 +165,7 @@ extern std::vector<s_flow_rule> g_flow_rule_tab;
 // Hash规则表项，查表得到fid号
 extern std::unordered_map<s_hash_rule_key, int, has_rule_key_hash> g_hash_rule_tab;
 
-// que_rule规则表项，查表得到rr_weight号,key为qid号
+// que_rule规则表项，查表得到rr_weight权重,key为qid号
 extern std::vector<s_tab_que> g_que_rule_tab;
 
 // port_rule规则表项，查表得到port_speed号,key为port号
@@ -191,37 +192,46 @@ public:
 //公共调度器函数
 class WRR_SCH
 {
+public:
+    int que_num;
+    int sch_pos;
+    std::vector<int> que_status;
+    std::vector<int> init_weight;
+    std::vector<int> cur_weight;
 
-
+public:
+    WRR_SCH(int tmp_que_num, std::vector<int> tmp_weight);
+    void set_que_valid(int que_id, bool valid_flag);
+    bool get_sch_result(int &rst_que);
+    void reload_weight_value();
 };
 class RR_SCH
 {
-    public:
-        int que_num;
-        int sch_pos;
-        vector<int> que_status;
-    public:
-        RR_SCH(int tmp_que_num);
-        void set_que_valid(int que_id, bool valid_flag);
-        bool  get_sch_result(int &rst_que);
+public:
+    int que_num;
+    int sch_pos;
+    std::vector<int> que_status;
 
+public:
+    RR_SCH(int tmp_que_num);
+    void set_que_valid(int que_id, bool valid_flag);
+    bool get_sch_result(int &rst_que);
 };
-                                                     
+
 class SP_SCH
 {
-    public:
-        int que_num;
-        int sch_pos;
-        vector<int> que_status;
-    public:
-        SP_SCH(int tmp_que_num);
-        void set_que_valid(int que_id, bool valid_flag);
-        void set_que_hpri (int que_id);
-        bool  get_sch_result(int &rst_que);
+public:
+    int que_num;
+    int sch_pos;
+    std::vector<int> que_status;
 
+public:
+    SP_SCH(int tmp_que_num);
+    void set_que_valid(int que_id, bool valid_flag);
+    void set_que_hpri(int que_id);
+    bool get_sch_result(int &rst_que);
 };
 
-
-#define  ASSERT(A)  (assert(A))
+#define ASSERT(A) (assert(A))
 
 #endif //__COMM_DEF_H__

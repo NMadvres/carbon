@@ -12,7 +12,7 @@
 mod_stat::mod_stat(sc_module_name name):
     sc_module(name)
 {
-    for (int i = 0; i < g_inter_num; i++) {
+    for (int i = 0; i < G_INTER_NUM; i++) {
         in_pkt_stat[i] = new sc_in<s_pkt_desc>();
     }
 }

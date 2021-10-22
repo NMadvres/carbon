@@ -1,7 +1,7 @@
 #ifndef __MOD_TESTCTRL_H__
 #define __MOD_TESTCTRL_H__
 
-#include "comm_def.h"
+#include "../../src/comm_def.h"
 
 class mod_testcrtl: public sc_module
 {

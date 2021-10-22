@@ -162,8 +162,6 @@ void glb_cfg_c::gen_cfg_table()
     }
 }
 
-
-
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   comm_def
@@ -176,34 +174,93 @@ void glb_cfg_c::gen_cfg_table()
 RR_SCH::RR_SCH(int tmp_que_num)
 {
     que_num = tmp_que_num;
-    que_status.resize(que_num,0);
+    que_status.resize(que_num, 0);
     sch_pos = 0;
 }
 
 void RR_SCH::set_que_valid(int que_id, bool valid_flag)
 {
-    if(que_id >= que_num)
-    {
-        cout << "error que_id" << que_id <<endl;
-    }
-    else
-    {
+    if (que_id >= que_num) {
+        cout << "error que_id" << que_id << endl;
+    } else {
         que_status[que_id] = valid_flag;
     }
 }
 
-bool  RR_SCH::get_sch_result(int &rst_que)
+bool RR_SCH::get_sch_result(int &rst_que)
 {
     int tmp_pos = sch_pos;
-    for (int i=0; i< que_num; i++)
-    {
-        tmp_pos = (sch_pos +i) % que_num;
-        if(que_status[tmp_pos] == 1)
-        {
-            sch_pos =(tmp_pos +1) % que_num;
+    for (int i = 0; i < que_num; i++) {
+        tmp_pos = (sch_pos + i) % que_num;
+        if (que_status[tmp_pos] == 1) {
+            sch_pos = (tmp_pos + 1) % que_num;
             rst_que = tmp_pos;
             return true;
         }
-    }   
+    }
     return false;
+}
+
+///////////////////////////////////////////////////////
+// Project： SystemC虚拟项目
+// Module:   comm_def
+// Description: WRR_SCH调度算法
+// Group：预研组
+// Author: Newton
+// Date: 2021.10.14 第一版
+// Hierarchy : 编号，索引公共库
+////////////////////////////////////////////////////////
+WRR_SCH::WRR_SCH(int tmp_que_num, vector<int> tmp_weight)
+{
+    que_num = tmp_que_num;
+    if (tmp_weight.size() != que_num) {
+        cout << "cfg a wrong weight value" << endl;
+        return;
+    }
+    que_status.resize(que_num, 0);
+    init_weight = tmp_weight;
+    cur_weight = tmp_weight;
+    sch_pos = 0;
+}
+
+void WRR_SCH::set_que_valid(int que_id, bool valid_flag)
+{
+    if (que_id >= que_num) {
+        cout << "error que_id" << que_id << endl;
+    } else {
+        que_status[que_id] = valid_flag;
+    }
+}
+
+bool WRR_SCH::get_sch_result(int &rst_que)
+{
+    //如果所有队列weight 减为0，统一刷新
+    bool update_weight_flag = true;
+    for (int index = 0; index < que_num; index++) {
+        if (cur_weight[index] > 0) {
+            update_weight_flag = false;
+            break;
+        }
+    }
+    //如果全为0，reload value
+    if (update_weight_flag == true) {
+        reload_weight_value();
+    }
+
+    int tmp_pos = sch_pos;
+    for (int i = 0; i < que_num; i++) {
+        tmp_pos = (sch_pos + i) % que_num;
+        if ((que_status[tmp_pos] == 1) && (cur_weight[tmp_pos] > 0)) {
+            sch_pos = (tmp_pos + 1) % que_num;
+            rst_que = tmp_pos;
+            cur_weight[tmp_pos] -= 1; //扣权重
+            return true;
+        }
+    }
+    return false;
+}
+
+void WRR_SCH::reload_weight_value()
+{
+    cur_weight = init_weight;
 }

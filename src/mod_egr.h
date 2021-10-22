@@ -20,7 +20,7 @@ public:
 
 public:
     sc_in<s_pkt_desc> in_port;
-    std::array<sc_out<s_pkt_desc> *, g_inter_num> out_port;
+    std::array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_port;
     sc_in<int> in_clk_cnt;
 };
 #endif // __MOD_EGR_H__

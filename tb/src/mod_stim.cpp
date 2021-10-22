@@ -12,7 +12,7 @@
 mod_stim::mod_stim(sc_module_name name):
     sc_module(name)
 {
-    for (int i = 0; i < g_inter_num; i++) {
+    for (int i = 0; i < G_INTER_NUM; i++) {
         out_pkt_stim[i] = new sc_out<s_pkt_desc>();
     }
     //敏感信号触发

@@ -11,7 +11,7 @@
 mod_egr::mod_egr(sc_module_name name):
     sc_module(name)
 {
-    for (int i = 0; i < g_inter_num; i++) {
+    for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
     }
 }

@@ -1,7 +1,7 @@
 #include "comm_def.h"
 #include "systemc.h"
 #include "top_carbon.h"
-#include "top_tb.h"
+#include "../tb/src/top_tb.h"
 
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
@@ -22,12 +22,11 @@ int sc_main(int argc, char *argv[])
     top_carbon top_carbon_mod("top_carbon");
     top_tb top_tb_mod("top_tb");
     //顶层绑定
-    array<sc_signal<s_pkt_desc> *, g_inter_num>  tb_ing_sig;
-    array<sc_signal<s_pkt_desc> *, g_inter_num>  egr_tb_sig;
-    for(int i =0; i < g_inter_num; i++)
-    {
-        tb_ing_sig[i] =new sc_signal<s_pkt_desc> ();
-        egr_tb_sig[i] =new sc_signal<s_pkt_desc> ();
+    array<sc_signal<s_pkt_desc> *, G_INTER_NUM> tb_ing_sig;
+    array<sc_signal<s_pkt_desc> *, G_INTER_NUM> egr_tb_sig;
+    for (int i = 0; i < G_INTER_NUM; i++) {
+        tb_ing_sig[i] = new sc_signal<s_pkt_desc>();
+        egr_tb_sig[i] = new sc_signal<s_pkt_desc>();
         (*top_carbon_mod.in_ing_port[i])(*tb_ing_sig[i]);
         (*top_carbon_mod.out_egr_port[i])(*egr_tb_sig[i]);
         (*top_tb_mod.in_pkt_stat[i])(*egr_tb_sig[i]);

@@ -16,16 +16,16 @@
 mod_ing::mod_ing(sc_module_name name):
     sc_module(name)
 {
-    rr_sch = new RR_SCH(g_inter_num);
+    rr_sch = new RR_SCH(G_INTER_NUM);
 
-    for (int i = 0; i < g_inter_num; i++) {
+    for (int i = 0; i < G_INTER_NUM; i++) {
         in_port[i] = new sc_in<s_pkt_desc>();
         pkt_count_port[i] = 0;
         infifo_count_port[i] = 0;
         drop_count_port[i] = 0;
     }
     SC_METHOD(main_process);
-    sensitive << clkcnt;
+    sensitive << in_clk_cnt;
 }
 
 void mod_ing::main_process()
@@ -38,7 +38,7 @@ void mod_ing::main_process()
 
 void mod_ing::rev_pkt_process()
 {
-    for (int i = 0; i < g_inter_num; i++) {
+    for (int i = 0; i < G_INTER_NUM; i++) {
         if (in_port[i]->event()) {
             pkt_count_port[i]++;
             if (fifo_port[i].size() == 16) {
@@ -60,7 +60,7 @@ void mod_ing::rev_pkt_process()
 
 void mod_ing::port_rr_sch_process()
 {
-    for (int i = 0; i < g_inter_num; i++) {
+    for (int i = 0; i < G_INTER_NUM; i++) {
         if (fifo_port[i].size() > 0) {
             rr_sch->set_que_valid(i, true); // que非空的时候才参与sch
         } else {
