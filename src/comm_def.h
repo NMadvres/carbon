@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <assert.h>
 #include "systemc.h"
-
+using namespace std;
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   commdef
