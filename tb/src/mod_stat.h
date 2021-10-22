@@ -14,13 +14,12 @@
 ////////////////////////////////////////////////////////
 class mod_stat: public sc_module
 {
-public:
-    mod_stat(sc_module_name name);
-    SC_HAS_PROCESS(mod_stat);
-
-public:
-    std::array<sc_in<s_pkt_desc> *, g_inter_num> in_pkt_ports;
-    sc_in<int> in_clk_cnt;
+    public:    
+        mod_stat(sc_module_name name);
+        SC_HAS_PROCESS(mod_stat);
+    public:
+        array<sc_in<s_pkt_desc> *, g_inter_num>        in_pkt_stat;
+        sc_in<int>                                     in_clk_cnt;  
 };
 
 #endif // __MOD_STAT_H__

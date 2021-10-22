@@ -188,6 +188,40 @@ public:
     std::vector<std::vector<int>> g_port_tab_relate; //两维度；其中第一维是表项深度（包括key和value项），二维是index及value的横向展开
 };
 
-#define ASSERT(A) (assert(A))
+//公共调度器函数
+class WRR_SCH
+{
+
+
+};
+class RR_SCH
+{
+    public:
+        int que_num;
+        int sch_pos;
+        vector<int> que_status;
+    public:
+        RR_SCH(int tmp_que_num);
+        void set_que_valid(int que_id, bool valid_flag);
+        bool  get_sch_result(int &rst_que);
+
+};
+                                                     
+class SP_SCH
+{
+    public:
+        int que_num;
+        int sch_pos;
+        vector<int> que_status;
+    public:
+        SP_SCH(int tmp_que_num);
+        void set_que_valid(int que_id, bool valid_flag);
+        void set_que_hpri (int que_id);
+        bool  get_sch_result(int &rst_que);
+
+};
+
+
+#define  ASSERT(A)  (assert(A))
 
 #endif //__COMM_DEF_H__

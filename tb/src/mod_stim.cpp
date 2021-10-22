@@ -13,7 +13,7 @@ mod_stim::mod_stim(sc_module_name name):
     sc_module(name)
 {
     for (int i = 0; i < g_inter_num; i++) {
-        out_pkt_ports[i] = new sc_out<s_pkt_desc>();
+        out_pkt_stim[i] = new sc_out<s_pkt_desc>();
     }
     //敏感信号触发
     SC_METHOD(process_gen_packet);

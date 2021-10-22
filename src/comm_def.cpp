@@ -161,3 +161,49 @@ void glb_cfg_c::gen_cfg_table()
         }
     }
 }
+
+
+
+////////////////////////////////////////////////////////
+// Project： SystemC虚拟项目
+// Module:   comm_def
+// Description: RR_SCH调度算法
+// Group：预研组
+// Author: Newton
+// Date: 2021.10.14 第一版
+// Hierarchy : 编号，索引公共库
+////////////////////////////////////////////////////////
+RR_SCH::RR_SCH(int tmp_que_num)
+{
+    que_num = tmp_que_num;
+    que_status.resize(que_num,0);
+    sch_pos = 0;
+}
+
+void RR_SCH::set_que_valid(int que_id, bool valid_flag)
+{
+    if(que_id >= que_num)
+    {
+        cout << "error que_id" << que_id <<endl;
+    }
+    else
+    {
+        que_status[que_id] = valid_flag;
+    }
+}
+
+bool  RR_SCH::get_sch_result(int &rst_que)
+{
+    int tmp_pos = sch_pos;
+    for (int i=0; i< que_num; i++)
+    {
+        tmp_pos = (sch_pos +i) % que_num;
+        if(que_status[tmp_pos] == 1)
+        {
+            sch_pos =(tmp_pos +1) % que_num;
+            rst_que = tmp_pos;
+            return true;
+        }
+    }   
+    return false;
+}
