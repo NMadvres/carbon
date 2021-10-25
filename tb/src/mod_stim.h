@@ -7,6 +7,7 @@
 #include <iostream>
 #define SEND_FILE_NUM 64
 #define FLOW_RULE_TAB_SIZE 16
+#define TOKEN_MAX_BYTE 125*100*2
 
 struct mod_stim: sc_module
 {
@@ -17,7 +18,7 @@ struct mod_stim: sc_module
    char *pkt_sender_filename = (char*)"pkt_sender_file.log";
 
   //信号
-    ofstream pkt_sender_file;
+  ofstream pkt_sender_file;
 
   SC_CTOR(mod_stim)
   {

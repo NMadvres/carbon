@@ -29,12 +29,18 @@ s_pkt_desc port_fifo::pkt_pre_val()
 
 void token_bucket::add_token(const int& add_token_val)
 {
-    token = token + add_token_val;
+    if((token + add_token_val) > TOKEN_MAX_BYTE)
+        token = TOKEN_MAX_BYTE;
+    else
+        token = token + add_token_val;
 }
 
 void token_bucket::sub_token(const int& sub_token_val)
 {
-    token = token - sub_token_val;
+    if ((token - sub_token_val) < 0)
+        token = 0;
+    else
+        token = token - sub_token_val;
 }
 
 int token_bucket::read_token()
