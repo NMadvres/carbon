@@ -212,8 +212,10 @@ bool RR_SCH::get_sch_result(int &rst_que)
 ////////////////////////////////////////////////////////
 WRR_SCH::WRR_SCH(int tmp_que_num, vector<int> tmp_weight)
 {
+    assert(tmp_que_num > 0);
+
     que_num = tmp_que_num;
-    if (tmp_weight.size() != que_num) {
+    if (tmp_weight.size() != (unsigned int)que_num) {
         cout << "cfg a wrong weight value" << endl;
         return;
     }
