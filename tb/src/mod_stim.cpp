@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include "stim.h"
+#include "mod_stim.h"
 #include "comm_def.h"
 
 void port_fifo::pkt_in(const s_pkt_desc& data_pkt)
@@ -49,7 +49,7 @@ int token_bucket::read_token()
     return(temp);
 }
 
-void stim :: stim_prc()
+void mod_stim :: stim_prc()
 {
     int pkt_send_count;
     int send_pkt_port;
@@ -167,9 +167,9 @@ void stim :: stim_prc()
                 port_token_bucket[send_port].sub_token(pkt_desc_tmp.len);
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
                 cout << "@" << in_clk_cnt << "_clks stim sent =>:"
-                    << pkt_desc_tmp << endl;
+                    << "sport:" << send_port << pkt_desc_tmp << endl;
                 pkt_sender_file << "@" << in_clk_cnt << "_clks stim sent =>:"
-                    << pkt_desc_tmp;
+                    << "sport:" << send_port << pkt_desc_tmp;
             }
         }
 

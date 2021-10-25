@@ -74,20 +74,20 @@ struct s_pkt_desc
 
 inline ostream &operator<<(ostream &os, const s_pkt_desc &a /* a */)
 {
-    os << "type:" << a.type << endl;
-    os << "fid:" << a.fid << endl;
-    os << "sid:" << a.sid << endl;
-    os << "did:" << a.did << endl;
-    os << "fsn:" << a.fsn << endl;
-    os << "len:" << a.len << endl;
-    os << "pri:" << a.pri << endl;
-    os << "sport:" << a.sport << endl;
-    os << "dport:" << a.dport << endl;
-    os << "qid:" << a.qid << endl;
-    os << "vldl:" << a.vldl << endl;
-    os << "csn:" << a.csn << endl;
-    os << "sop:" << a.sop << endl;
-    os << "eop:" << a.eop << endl;
+    os << "[type:" << a.type;
+    os << ",fid:" << a.fid;
+    os << ",sid:" << a.sid;
+    os << ",did:" << a.did;
+    os << ",fsn:" << a.fsn;
+    os << ",len:" << a.len;
+    os << ",pri:" << a.pri;
+    os << ",sport:" << a.sport;
+    os << ",dport:" << a.dport;
+    os << ",qid:" << a.qid;
+    os << ",vldl:" << a.vldl;
+    os << ",csn:" << a.csn;
+    os << ",sop:" << a.sop;
+    os << ",eop:" << a.eop << "]" << endl;
     return os;
 }
 

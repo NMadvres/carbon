@@ -10,7 +10,7 @@
 #define SEND_FILE_NUM 64
 #define FLOW_RULE_TAB_SIZE 16
 
-struct stim: sc_module
+struct mod_stim: sc_module
 {
   //端口
   sc_in<int> in_clk_cnt;
@@ -29,7 +29,7 @@ struct stim: sc_module
   //std::array<bool,G_INTER_NUM> fifo_empty;
   //std::array<int,G_INTER_NUM>  fifo_pntr;
 
-  SC_CTOR(stim)
+  SC_CTOR(mod_stim)
   {
     pkt_desc_tmp.type    = -1;
     pkt_desc_tmp.fid     = -1;

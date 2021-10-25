@@ -42,7 +42,7 @@ public:
         //互联
         //ing的入口和egr的出口，连线透传到顶层，待更高层进行连接
         for (int i = 0; i < G_INTER_NUM; i++) {
-            stim_mod->out_pkt_stim[i]->bind(*out_pkt_stim[i]);
+            stim_mod->out_pkt_stim[i](*out_pkt_stim[i]);
             stat_mod->in_pkt_stat[i]->bind(*in_pkt_stat[i]);
         }
         testcrtl_mod->in_glb_clk(in_glb_clk); //透传clk连线
