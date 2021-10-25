@@ -17,12 +17,23 @@ struct mod_stim: sc_module
    char *pkt_sender_filename = (char*)"pkt_sender_file.log";
 
   //信号
+    ofstream pkt_sender_file;
 
   SC_CTOR(mod_stim)
   {
+//    pkt_sender_file.open("pkt_sender_file.log");
+    pkt_sender_file.open(pkt_sender_filename);
+
     SC_THREAD(stim_prc);
     sensitive << in_clk_cnt;
   }
+
+   ~mod_stim()
+	{
+		pkt_sender_file.flush();
+		pkt_sender_file.close();
+	}
+
   void stim_prc();
 };
 

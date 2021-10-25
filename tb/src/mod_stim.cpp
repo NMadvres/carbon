@@ -1,6 +1,5 @@
 #include "mod_stim.h"
 
-
 void port_fifo::pkt_in(const s_pkt_desc& data_pkt)
 {
     regs[pntr++] = data_pkt;
@@ -57,10 +56,6 @@ void mod_stim :: stim_prc()
     array<int,FLOW_RULE_TAB_SIZE> flow_sn;
     s_pkt_desc pkt_desc_tmp;  
 
-    ofstream pkt_sender_file;
-//    pkt_sender_file.open("pkt_sender_file.log");
-    pkt_sender_file.open(pkt_sender_filename);
-
     pkt_send_count = 0;
     token_count = 0;
 
@@ -109,8 +104,8 @@ void mod_stim :: stim_prc()
         }
 
         // generate desc packet per flow
-        if (pkt_send_count < SEND_FILE_NUM)
-        {
+//        if (pkt_send_count < SEND_FILE_NUM)
+//        {
             for(int fid=0; fid < FLOW_RULE_TAB_SIZE; fid++)
             {
                 send_pkt_port = g_flow_rule_tab[fid].sport;
@@ -147,7 +142,7 @@ void mod_stim :: stim_prc()
                 pkt_send_count++;
                 }
             }
-        }
+//        }
 
         // output desc packet to each port
         for(int send_port=0; send_port<G_INTER_NUM; send_port++)
@@ -169,5 +164,4 @@ void mod_stim :: stim_prc()
 
         wait();
     }
-    pkt_sender_file.close();
 }
