@@ -18,7 +18,6 @@ struct mod_stim: sc_module
 
   //信号
 
-
   SC_CTOR(mod_stim)
   {
     SC_THREAD(stim_prc);

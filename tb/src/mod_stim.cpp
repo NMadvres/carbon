@@ -1,5 +1,6 @@
 #include "mod_stim.h"
 
+
 void port_fifo::pkt_in(const s_pkt_desc& data_pkt)
 {
     regs[pntr++] = data_pkt;
