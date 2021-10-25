@@ -91,9 +91,31 @@ inline ostream &operator<<(ostream &os, const s_pkt_desc &a /* a */)
     return os;
 }
 
-inline void sc_trace(sc_trace_file *tf, const s_pkt_desc &a, const std::string &name)
+//inline void sc_trace(sc_trace_file *tf, const s_pkt_desc &a, const std::string &name)
+//{
+//    sc_trace(tf, a.sport, name + ".data");
+//}
+inline void
+#if defined(SC_API_VERSION_STRING)
+    sc_trace( sc_trace_file* tf, const s_pkt_desc& a, const std::string& name )
+#else
+    sc_trace( sc_trace_file* tf, const s_pkt_desc& a, const sc_string& name )
+#endif
 {
-    sc_trace(tf, a.sport, name + ".data");
+  sc_trace( tf, a.type,  name + ".type" );
+  sc_trace( tf, a.fid,   name + ".fid"  );
+  sc_trace( tf, a.sid,   name + ".sid"  );
+  sc_trace( tf, a.did,   name + ".did"  );
+  sc_trace( tf, a.fsn,   name + ".fsn"  );
+  sc_trace( tf, a.len,   name + ".len"  );
+  sc_trace( tf, a.pri,   name + ".pri"  );
+  sc_trace( tf, a.sport, name + ".sport");
+  sc_trace( tf, a.dport, name + ".dport");
+  sc_trace( tf, a.qid,   name + ".qid"  );
+  sc_trace( tf, a.vldl,  name + ".vldl" );
+  sc_trace( tf, a.csn,   name + ".csn"  );
+  sc_trace( tf, a.sop,   name + ".sop"  );
+  sc_trace( tf, a.eop,   name + ".eop"  );
 }
 
 // fid映射规则表内容
