@@ -122,7 +122,7 @@ void mod_stim :: stim_prc()
                 send_pkt_port = g_flow_rule_tab[fid].sport;
 
                 pkt_desc_tmp.type = 0;
-                pkt_desc_tmp.fid  = -1;
+                pkt_desc_tmp.fid  = fid;
                 pkt_desc_tmp.sid  = g_flow_rule_tab[fid].sid;
                 pkt_desc_tmp.did  = g_flow_rule_tab[fid].did;
                 pkt_desc_tmp.fsn  = flow_sn[fid];
