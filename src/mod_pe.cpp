@@ -30,6 +30,7 @@ void mod_pe::on_recv_cell()
         return;
     }
 
+    // no pending packet
     if (pkt_que.empty() || pkt_que.back().type == DESC_TYPE_PKT) {
         if (!cell.sop) {
             fprintf(stderr, "%s:%d: sop error\n", __FUNCTION__, __LINE__);
@@ -37,18 +38,20 @@ void mod_pe::on_recv_cell()
         }
 
         pkt_que.push_back(cell);
-        pkt_que.back().len = pkt_que.back().vldl;
-    } else {
-        // append cell data here
-        pkt_que.back().len += pkt_que.back().vldl;
+        pkt_que.back().len = 0;
     }
 
+    s_pkt_desc &pkt = pkt_que.back();
+
+    // append cell data here
+    pkt.len += cell.vldl;
+
     if (cell.eop) {
-        pkt_que.back().type = DESC_TYPE_PKT;
-        pkt_que.back().vldl = -1;
-        pkt_que.back().csn = -1;
-        pkt_que.back().sop = -1;
-        pkt_que.back().eop = -1;
+        pkt.type = DESC_TYPE_PKT;
+        pkt.vldl = -1;
+        pkt.csn = -1;
+        pkt.sop = -1;
+        pkt.eop = -1;
     }
 }
 
@@ -59,6 +62,17 @@ void mod_pe::on_send_pkt()
     if (pkt_que.empty())
         return;
 
-    out_cell_que.write(pkt_que.front());
+    s_pkt_desc &pkt = pkt_que.front();
+
+    if (g_flow_rule_tab.size() < (unsigned int)pkt.fid) {
+        fprintf(stderr, "%s:%d: fid error\n", __FUNCTION__, __LINE__);
+        pkt_que.pop_front();
+        return;
+    }
+
+    // edit packet
+    pkt.len += g_flow_rule_tab[pkt.fid].len2add;
+
+    out_cell_que.write(pkt);
     pkt_que.pop_front();
 }
