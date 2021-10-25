@@ -24,13 +24,21 @@ mod_ing::mod_ing(sc_module_name name):
         infifo_count_port[i] = 0;
         drop_count_port[i] = 0;
     }
+
+    SC_METHOD(rev_pkt_process);
+    for (int i = 0; i < G_INTER_NUM; i++) {
+        sensitive << *in_port[i];
+    }
+    dont_initialize();
+
     SC_METHOD(main_process);
     sensitive << in_clk_cnt;
+    dont_initialize();
 }
 
 void mod_ing::main_process()
 {
-    rev_pkt_process();
+    //rev_pkt_process();
     port_rr_sch_process();
     lut_process();
     pkt_to_cell_process();
@@ -39,7 +47,7 @@ void mod_ing::main_process()
 void mod_ing::rev_pkt_process()
 {
     for (int i = 0; i < G_INTER_NUM; i++) {
-        if (in_port[i]->event()) {
+        if ((*in_port[i]).event()) {
             pkt_count_port[i]++;
             if (fifo_port[i].size() == 16) {
                 drop_count_port[i]++;
@@ -130,7 +138,7 @@ void mod_ing::pkt_to_cell_process()
     s_pkt_desc cell_trans;
     cell_sn = 0;
     // FIXME 临时编译修改
-    int cell_len = 0;
+    int cell_len = 64;
 
     if (pkt_tmp_len > 0) {
         while (pkt_tmp_len >= cell_len) {

@@ -64,11 +64,11 @@ struct s_pkt_desc
 
     inline bool operator==(const s_pkt_desc &rhs) const
     {
-        return rhs.type == type && rhs.fid == fid && rhs.sid == sid
-               && rhs.did == did && rhs.fsn == fsn && rhs.len == len
-               && rhs.pri == pri && rhs.sport == sport && rhs.dport == dport
-               && rhs.qid == qid && rhs.vldl == vldl && rhs.csn == csn
-               && rhs.sop == sop && rhs.eop == eop;
+        return ((rhs.type == type) && (rhs.fid == fid) && (rhs.sid == sid)
+                && (rhs.did == did) && (rhs.fsn == fsn) && (rhs.len == len)
+                && (rhs.pri == pri) && (rhs.sport == sport) && (rhs.dport == dport)
+                && (rhs.qid == qid) && (rhs.vldl == vldl) && (rhs.csn == csn)
+                && (rhs.sop == sop) && (rhs.eop == eop));
     }
 };
 

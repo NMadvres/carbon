@@ -44,6 +44,10 @@ glb_cfg_c::glb_cfg_c(std::string file_name)
 void glb_cfg_c::read_cfg_file(std::string file_name)
 {
     ifstream in_file(file_name.c_str());
+    if (!in_file.is_open()) {
+        cout << "cfg file error" << endl;
+        return;
+    }
     std::string read_line;
     int file_pos_status = -255; // 如果status =1,读取流表 status =2,读取HASH表  status =3,读取队列权重表  status =4,读取Port端口表
     while (getline(in_file, read_line)) {
@@ -265,4 +269,57 @@ bool WRR_SCH::get_sch_result(int &rst_que)
 void WRR_SCH::reload_weight_value()
 {
     cur_weight = init_weight;
+}
+
+////////////////////////////////////////////////////////
+// Project： SystemC虚拟项目
+// Module:   comm_def
+// Description: SP调度算法
+// Group：预研组
+// Author: Newton
+// Date: 2021.10.14 第一版
+// Hierarchy : 编号，索引公共库
+////////////////////////////////////////////////////////
+SP_SCH::SP_SCH(int tmp_que_num)
+{
+    que_num = tmp_que_num;
+    que_status.resize(que_num, 0);
+    sch_pos = 0;
+}
+
+void SP_SCH::set_que_valid(int que_id, bool valid_flag)
+{
+    if (que_id >= que_num) {
+        cout << "error que_id" << que_id << endl;
+    } else {
+        que_status[que_id] = valid_flag;
+    }
+}
+
+void SP_SCH::set_que_hpri(int que_id)
+{
+    if (que_id >= que_num) {
+        cout << "error que_id" << que_id << endl;
+    } else {
+        sch_pos = que_id;
+    }
+}
+
+bool SP_SCH::get_sch_result(int &rst_que)
+{
+    int tmp_pos = sch_pos;
+    if (que_status[tmp_pos] == 1) {
+        rst_que = tmp_pos;
+        return true;
+    } else {
+        for (int i = 0; i < que_num; i++) {
+            tmp_pos = (sch_pos + i) % que_num;
+            if (que_status[tmp_pos] == 1) {
+                rst_que = tmp_pos;
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

@@ -15,13 +15,18 @@ mod_sch::mod_sch(sc_module_name name):
     wrr_sch = new WRR_SCH(G_QUE_NUM, g_que_rule_tab);
     input_cell_que.resize(G_QUE_NUM);
     que_status.resize(G_QUE_NUM, 0);
+    SC_METHOD(rev_pkt_process);
+    sensitive << in_cell_que;
+    dont_initialize();
+
     SC_METHOD(main_process);
     sensitive << in_clk_cnt;
+    dont_initialize();
 }
 
 void mod_sch::main_process()
 {
-    rev_pkt_process();
+    //rev_pkt_process();
     sch_pkt_process();
 }
 

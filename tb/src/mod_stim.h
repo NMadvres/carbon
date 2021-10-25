@@ -2,7 +2,7 @@
 #define __STIM_H__
 
 #include "systemc.h"
-#include "comm_def.h" 
+#include "../../src/comm_def.h"
 #include <string>
 #include <iostream>
 #define SEND_FILE_NUM 64
