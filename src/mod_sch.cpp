@@ -36,6 +36,10 @@ void mod_sch::rev_pkt_process()
         s_pkt_desc rd_pkt = in_cell_que.read();
         int que_id = rd_pkt.qid;
         input_cell_que[que_id].push_back(rd_pkt);
+        if (input_cell_que[que_id].size() > 1000) {
+            cout << "input_cell_que overflow size:" << input_cell_que[que_id].size() << endl;
+            ASSERT(0);
+        }
 
         //队列状态刷新，如果遇到EOP尾切片，则认为该队列可以参与调度
         if (rd_pkt.eop) {
