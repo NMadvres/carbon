@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////
 mod_pe::mod_pe(sc_module_name name):
     sc_module(name),
-    clk_gap(G_FREQ / G_PE_MPPS),
+    clk_gap(G_FREQ_MHZ / G_PE_MPPS),
     clk_wait(0)
 {
     SC_METHOD(on_recv_cell);
