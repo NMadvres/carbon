@@ -12,7 +12,8 @@
 mod_pe::mod_pe(sc_module_name name):
     sc_module(name),
     clk_gap(G_FREQ_MHZ / G_PE_MPPS),
-    clk_wait(0)
+    clk_wait(0),
+    is_busy(false)
 {
     SC_METHOD(on_recv_cell);
     sensitive << in_cell_que;
@@ -29,6 +30,15 @@ void mod_pe::on_recv_cell()
 
     if (cell.type != DESC_TYPE_CELL) {
         fprintf(stderr, "%s:%d: cell type error\n", __FUNCTION__, __LINE__);
+        return;
+    }
+
+    // TODO add config
+    if (pkt_que.size() == 2) {
+        fprintf(stderr, "%s:%d: pe queue full, drop it\n", __FUNCTION__, __LINE__);
+        if (!is_busy) {
+            out_pe_busy.write(1);
+        }
         return;
     }
 
@@ -82,4 +92,7 @@ void mod_pe::on_send_pkt()
     pkt_que.pop_front();
 
     clk_wait = clk_gap;
+
+    if (is_busy)
+        out_pe_busy.write(0);
 }
