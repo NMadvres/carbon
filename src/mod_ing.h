@@ -37,9 +37,11 @@ public:
 private:
     s_pkt_desc s_port_sch_result;
     int que_id;
+    int dport_id; 
     int flow_id;
     int pkt_tmp_len = 0;
     int pkt_out_flag = 0;
+    int pkt_head_flag = 0;
     s_flow_rule flow_rule;
 
     std::array<std::deque<s_pkt_desc>, G_INTER_NUM> fifo_port;

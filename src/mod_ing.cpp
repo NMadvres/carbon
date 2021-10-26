@@ -90,11 +90,12 @@ void mod_ing::port_rr_sch_process()
 
         pkt_tmp_len = front_trans.len;
         pkt_out_flag = 1;
+        pkt_head_flag = 1;    
         rst_flag = false;
 
 #ifdef mod_ing_print
         cout << "port_rr_sch_process..."
-             << "sch rslt flag: " << rst_flag << " sch rslt que id : " << rst_que << endl;
+             << "sch rslt flag: " << rslt_flag << " sch rslt port id : " << rst_que << endl;
 #endif
     }
 }
@@ -126,6 +127,7 @@ void mod_ing::lut_process()
         flow_rule = g_flow_rule_tab[flow_id];
 
         que_id = flow_rule.qid;
+        dport_id  = flow_rule.dport;
 #ifdef mod_ing_print
         cout << "que_id " << que_id << endl;
 #endif
@@ -137,45 +139,63 @@ void mod_ing::pkt_to_cell_process()
     int cell_sn;
     s_pkt_desc cell_trans;
     cell_sn = 0;
-    // FIXME 临时编译修改
-    int cell_len = 64;
 
-    if (pkt_tmp_len > 0) {
-        while (pkt_tmp_len >= cell_len) {
-            cell_trans = s_port_sch_result;
-            cell_trans.qid = que_id;
-            cell_trans.fid = flow_id;
-            cell_trans.vldl = cell_len;
-            cell_trans.csn = cell_sn;
+    while (pkt_tmp_len >= G_CELL_LEN) {
+        cell_trans = s_port_sch_result;
+        cell_trans.type = 1;
+        cell_trans.qid = que_id;
+        cell_trans.dport = dport_id;
+        cell_trans.fid = flow_id;
+        cell_trans.vldl = G_CELL_LEN;
+        cell_trans.csn = cell_sn;
+        if (pkt_head_flag == 1){
+            cell_trans.sop = true;
+        } else {                
+            cell_trans.sop = false;
+        }
+        if (pkt_tmp_len ==G_CELL_LEN ){
+            cell_trans.eop = true;
+            pkt_out_flag = 0;
+        } else {                
             cell_trans.eop = false;
-
-            out_cell_que.write(cell_trans);
-            pkt_tmp_len -= cell_len;
-            cell_sn++;
-#ifdef mod_ing_print
-            cout << "pkt_to_cell_process..."
-                 << "cell_trans  : fsn: " << cell_trans.fsn << " sid: " << cell_trans.sid << " did: " << cell_trans.did
-                 << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid
-                 << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " eop: " << cell_trans.eop << endl;
-#endif
         }
 
+        out_cell_que.write(cell_trans);
+        pkt_tmp_len -= G_CELL_LEN;
+        pkt_head_flag = 0;
+        cell_sn++;
+#ifdef mod_ing_print
+        cout << "pkt_to_cell_process..."
+             << "cell_trans  : fsn: " << cell_trans.fsn << " sid: " << cell_trans.sid << " did: " << cell_trans.did
+             << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid << " dport: " << cell_trans.dport
+             << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " sop: " << cell_trans.sop<< " eop: " << cell_trans.eop << endl;
+#endif
+    }
+    if (pkt_tmp_len > 0) {
         cell_trans = s_port_sch_result;
+        cell_trans.type = 1;        
         cell_trans.qid = que_id;
+        cell_trans.dport = dport_id;       
         cell_trans.fid = flow_id;
         cell_trans.vldl = pkt_tmp_len;
         cell_trans.csn = cell_sn;
+        if (pkt_head_flag == 1){
+                cell_trans.sop = true;
+            } else {                
+                cell_trans.sop = false;
+            }
+
+        cell_trans.sop = false;
         cell_trans.eop = true;
         out_cell_que.write(cell_trans);
 
         pkt_tmp_len = 0;
         pkt_out_flag = 0;
-
 #ifdef mod_ing_print
         cout << "pkt_to_cell_process..."
              << "cell_trans  : fsn: " << cell_trans.fsn << " sid: " << cell_trans.sid << " did: " << cell_trans.did
-             << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid
-             << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " eop: " << cell_trans.eop << endl;
+             << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid << " dport: " << cell_trans.dport
+             << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " sop: " << cell_trans.sop << " eop: " << cell_trans.eop << endl;
 #endif
-    }
+    }    
 }
