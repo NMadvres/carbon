@@ -26,6 +26,7 @@ using namespace std;
 const int G_FREQ = 100; //100M HZ
 const int G_INTER_NUM = 4;
 const int G_QUE_NUM = 16;
+const int G_CELL_LEN = 64;
 
 struct s_pkt_desc
 {
