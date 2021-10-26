@@ -28,6 +28,13 @@ const int G_INTER_NUM = 4;
 const int G_QUE_NUM = 16;
 const int G_CELL_LEN = 64;
 
+enum DESC_TYPE
+{
+    DESC_TYPE_NULL = -1,
+    DESC_TYPE_PKT = 0,
+    DESC_TYPE_CELL = 1
+};
+
 struct s_pkt_desc
 {
     int type; // 0 packet 1 cell
@@ -46,7 +53,7 @@ struct s_pkt_desc
     int eop;   // 尾切片，只有cell状态下有意义
 
     s_pkt_desc():
-        type(-1),
+        type(DESC_TYPE_NULL),
         fid(-1),
         sid(-1),
         did(-1),
