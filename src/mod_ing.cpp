@@ -95,7 +95,7 @@ void mod_ing::port_rr_sch_process()
 
 #ifdef mod_ing_print
         cout << "port_rr_sch_process..."
-             << "sch rslt flag: " << rslt_flag << " sch rslt port id : " << rst_que << endl;
+             << "sch rslt flag: " << rst_flag << " sch rslt port id : " << rst_que << endl;
 #endif
     }
 }
