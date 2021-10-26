@@ -90,7 +90,7 @@ void mod_ing::port_rr_sch_process()
 
         pkt_tmp_len = front_trans.len;
         pkt_out_flag = 1;
-        pkt_head_flag = 1;    
+        pkt_head_flag = 1;
         rst_flag = false;
 
 #ifdef mod_ing_print
@@ -127,7 +127,7 @@ void mod_ing::lut_process()
         flow_rule = g_flow_rule_tab[flow_id];
 
         que_id = flow_rule.qid;
-        dport_id  = flow_rule.dport;
+        dport_id = flow_rule.dport;
 #ifdef mod_ing_print
         cout << "que_id " << que_id << endl;
 #endif
@@ -148,15 +148,15 @@ void mod_ing::pkt_to_cell_process()
         cell_trans.fid = flow_id;
         cell_trans.vldl = G_CELL_LEN;
         cell_trans.csn = cell_sn;
-        if (pkt_head_flag == 1){
+        if (pkt_head_flag == 1) {
             cell_trans.sop = true;
-        } else {                
+        } else {
             cell_trans.sop = false;
         }
-        if (pkt_tmp_len ==G_CELL_LEN ){
+        if (pkt_tmp_len == G_CELL_LEN) {
             cell_trans.eop = true;
             pkt_out_flag = 0;
-        } else {                
+        } else {
             cell_trans.eop = false;
         }
 
@@ -168,22 +168,22 @@ void mod_ing::pkt_to_cell_process()
         cout << "pkt_to_cell_process..."
              << "cell_trans  : fsn: " << cell_trans.fsn << " sid: " << cell_trans.sid << " did: " << cell_trans.did
              << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid << " dport: " << cell_trans.dport
-             << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " sop: " << cell_trans.sop<< " eop: " << cell_trans.eop << endl;
+             << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " sop: " << cell_trans.sop << " eop: " << cell_trans.eop << endl;
 #endif
     }
     if (pkt_tmp_len > 0) {
         cell_trans = s_port_sch_result;
-        cell_trans.type = 1;        
+        cell_trans.type = 1;
         cell_trans.qid = que_id;
-        cell_trans.dport = dport_id;       
+        cell_trans.dport = dport_id;
         cell_trans.fid = flow_id;
         cell_trans.vldl = pkt_tmp_len;
         cell_trans.csn = cell_sn;
-        if (pkt_head_flag == 1){
-                cell_trans.sop = true;
-            } else {                
-                cell_trans.sop = false;
-            }
+        if (pkt_head_flag == 1) {
+            cell_trans.sop = true;
+        } else {
+            cell_trans.sop = false;
+        }
 
         cell_trans.sop = false;
         cell_trans.eop = true;
@@ -197,5 +197,5 @@ void mod_ing::pkt_to_cell_process()
              << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid << " dport: " << cell_trans.dport
              << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " sop: " << cell_trans.sop << " eop: " << cell_trans.eop << endl;
 #endif
-    }    
+    }
 }

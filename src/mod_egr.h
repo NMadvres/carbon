@@ -17,10 +17,15 @@ class mod_egr: public sc_module
 public:
     mod_egr(sc_module_name name);
     SC_HAS_PROCESS(mod_egr);
+    void rev_pkt_process(void);
+    void send_pkt_process(void);
 
 public:
     sc_in<s_pkt_desc> in_port;
     std::array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_port;
     sc_in<int> in_clk_cnt;
+
+    std::deque<s_pkt_desc> fifo_port;
+    int pkt_count_port;
 };
 #endif // __MOD_EGR_H__

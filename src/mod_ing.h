@@ -37,7 +37,7 @@ public:
 private:
     s_pkt_desc s_port_sch_result;
     int que_id;
-    int dport_id; 
+    int dport_id;
     int flow_id;
     int pkt_tmp_len = 0;
     int pkt_out_flag = 0;
