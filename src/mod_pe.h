@@ -25,6 +25,8 @@ public:
     sc_in<s_pkt_desc> in_cell_que;
     sc_out<s_pkt_desc> out_cell_que;
     sc_in<int> in_clk_cnt;
+    const int clk_gap;
+    int clk_wait;
     std::deque<s_pkt_desc> pkt_que;
 };
 

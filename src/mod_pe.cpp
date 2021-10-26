@@ -10,7 +10,9 @@
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
 mod_pe::mod_pe(sc_module_name name):
-    sc_module(name)
+    sc_module(name),
+    clk_gap(G_FREQ / G_PE_MPPS),
+    clk_wait(0)
 {
     SC_METHOD(on_recv_cell);
     sensitive << in_cell_que;
@@ -57,7 +59,10 @@ void mod_pe::on_recv_cell()
 
 void mod_pe::on_send_pkt()
 {
-    // TODO speed limit check
+    if (!clk_wait) {
+        clk_wait--;
+        return;
+    }
 
     if (pkt_que.empty())
         return;
@@ -75,4 +80,6 @@ void mod_pe::on_send_pkt()
 
     out_cell_que.write(pkt);
     pkt_que.pop_front();
+
+    clk_wait = clk_gap;
 }
