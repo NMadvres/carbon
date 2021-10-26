@@ -23,8 +23,10 @@ public:
     sc_out<s_pkt_desc> out_cell_que;
     sc_in<int> in_clk_cnt;
     vector<deque<s_pkt_desc>> input_cell_que;
-    vector<int> que_status;
-    WRR_SCH *wrr_sch;
+    vector<vector<int>> que_status;
+    vector<WRR_SCH *> wrr_sch; //按照优先级分4个WRR调度， 队列0~3 对应优先级0 ，用WRR0调度，队列4~7 对应优先级1，用WRR1调度。。。。
+    int pri_group_num;
+    int que_per_group;
 
 public:
     void main_process();
