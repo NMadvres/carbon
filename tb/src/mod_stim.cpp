@@ -85,7 +85,7 @@ void mod_stim ::stim_prc()
 
     wait(8);
     while (1) {
-        if (token_count < G_FREQ) {
+        if (token_count < G_FREQ_MHZ) {
             token_count++;
         } else {
             token_count = 0;
