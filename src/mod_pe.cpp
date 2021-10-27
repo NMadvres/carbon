@@ -15,6 +15,8 @@ mod_pe::mod_pe(sc_module_name name):
     clk_wait(0),
     is_busy(false)
 {
+    assert(clk_gap > 0);
+
     SC_METHOD(on_recv_cell);
     sensitive << in_cell_que;
     dont_initialize();
@@ -38,6 +40,7 @@ void mod_pe::on_recv_cell()
         fprintf(stderr, "%s:%d: pe queue full, drop it\n", __FUNCTION__, __LINE__);
         if (!is_busy) {
             out_pe_busy.write(1);
+            is_busy = true;
         }
         return;
     }
@@ -91,7 +94,7 @@ void mod_pe::on_send_pkt()
     out_cell_que.write(pkt);
     pkt_que.pop_front();
 
-    clk_wait = clk_gap;
+    clk_wait = clk_gap - 1;
 
     if (is_busy)
         out_pe_busy.write(0);
