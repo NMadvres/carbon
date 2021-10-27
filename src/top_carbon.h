@@ -28,6 +28,7 @@ public:
     sc_signal<s_pkt_desc> ing_sch_sig;                          // 用于连接ing和sch
     sc_signal<s_pkt_desc> sch_pe_sig;                           // 用于连接ing和sch
     sc_signal<s_pkt_desc> pe_egr_sig;                           // 用于连接ing和sch
+    sc_signal<int> pe_sch_fc_sig;                               // 用于连接pe和sch,反压信号
     sc_in<int> in_clk_cnt;                                      // 全局时钟计数，用于互联
 
 public: // 例化及互联部分
@@ -54,6 +55,9 @@ public: // 例化及互联部分
 
         pe_mod->out_cell_que(pe_egr_sig);
         egr_mod->in_port(pe_egr_sig); // 绑定pe和egr
+
+        pe_mod->out_pe_busy(pe_sch_fc_sig); // 绑定pe和egrs
+        sch_mod->in_fc_port(pe_sch_fc_sig);
 
         // ing的入口和egr的出口，连线透传到顶层，待更高层进行连接
         for (int i = 0; i < G_INTER_NUM; i++) {

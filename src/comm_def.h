@@ -37,6 +37,26 @@ enum DESC_TYPE
     DESC_TYPE_CELL = 1
 };
 
+//时钟表内容
+struct s_clock_stamp
+{
+    int stm_out_clock; // 用于记录stm输出时钟
+    int ing_out_clock; // 用于记录ing输出时钟
+    int sch_out_clock; // 用于记录sch输出时钟
+    int pe_out_clock;  // 用于记录pe输出时钟
+    int egr_out_clock; // 用于记录egr输出时钟
+
+    //default value setting for s_clock_stamp constructor
+    s_clock_stamp()
+    {
+        stm_out_clock = 0;
+        ing_out_clock = 0;
+        sch_out_clock = 0;
+        pe_out_clock = 0;
+        egr_out_clock = 0;
+    }
+};
+
 struct s_pkt_desc
 {
     int type; // 0 packet 1 cell
@@ -53,6 +73,7 @@ struct s_pkt_desc
     int csn;   // cell切片号， 只有cell状态下有意义
     int sop;   // 首切片，只有cell状态下有意义
     int eop;   // 尾切片，只有cell状态下有意义
+    s_clock_stamp time_stamp;
 
     s_pkt_desc():
         type(DESC_TYPE_NULL),

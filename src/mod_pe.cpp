@@ -96,6 +96,8 @@ void mod_pe::on_send_pkt()
 
     clk_wait = clk_gap - 1;
 
-    if (is_busy)
+    if (is_busy) {
         out_pe_busy.write(0);
+        is_busy = false;
+    }
 }
