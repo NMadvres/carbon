@@ -63,6 +63,7 @@ void mod_sch::rev_pkt_process()
         s_pkt_desc rd_pkt = in_cell_que.read();
         int que_id = rd_pkt.qid;
         //增加状态判断，确定是否处于丢弃状态，对于SOP切片判断，如需丢弃则flag拉起
+        cout << "cur_cycle" << g_cycle_cnt << "   recv ing packet " << rd_pkt << "que size" << input_cell_que[que_id].size() << endl;
         if (rd_pkt.sop) {
             if (input_drop_flag[que_id] == 0) {
                 if (input_cell_que[que_id].size() > 100) {
@@ -88,7 +89,7 @@ void mod_sch::rev_pkt_process()
                 que_status[que_id / G_PRI_NUM][que_id % G_PRI_NUM] = 1;
             }
         } else {
-            cout << "drop packet" << rd_pkt << endl;
+            cout << "cur_cycle" << g_cycle_cnt << "drop packet" << rd_pkt << endl;
         }
 
         if (input_cell_que[que_id].size() > 1000) {
@@ -183,6 +184,7 @@ void mod_sch::send_cell_to_pe(int que_id)
         s_pkt_desc cur_cell = input_cell_que[que_id].front();
         input_cell_que[que_id].pop_front();
         out_cell_que.write(cur_cell);
+        cout << "cur_cycle" << g_cycle_cnt << "   send packet to PE " << cur_cell << endl;
         if (cur_cell.eop == true) {
             break;
         }

@@ -243,7 +243,7 @@ bool WRR_SCH::get_sch_result(int &rst_que)
     //如果所有队列weight 减为0，统一刷新
     bool update_weight_flag = true;
     for (int index = 0; index < que_num; index++) {
-        if (cur_weight[index] > 0) {
+        if ((cur_weight[index] > 0) && (que_status[index] == 1)) {
             update_weight_flag = false;
             break;
         }
@@ -263,6 +263,7 @@ bool WRR_SCH::get_sch_result(int &rst_que)
             return true;
         }
     }
+
     return false;
 }
 
