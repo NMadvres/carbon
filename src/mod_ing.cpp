@@ -56,11 +56,11 @@ void mod_ing::rev_pkt_process()
                 infifo_count_port[i]++;
             }
 #ifdef mod_ing_print
-            cout << "rev_pkt_process..."
-                 << "port id: " << i << " pkts received: " << pkt_count_port[i]
-                 << " pkts infifo: " << infifo_count_port[i] << " pkts dropped: " << drop_count_port[i]
-                 << " fsn: " << in_port[i]->read().fsn << " sid: " << in_port[i]->read().sid << " did: " << in_port[i]->read().did
-                 << " pri:" << in_port[i]->read().pri << " len:" << in_port[i]->read().len << endl;
+            cout << "cur_cycle" << g_cycle_cnt  << " ing_in_pkt:"
+                << " port id: " << i << " pkts received: " << pkt_count_port[i]
+                << " pkts infifo: " << infifo_count_port[i] << " pkts dropped: " << drop_count_port[i]
+                << " fsn: " << in_port[i]->read().fsn << " sid: " << in_port[i]->read().sid << " did: " << in_port[i]->read().did
+                << " pri:" << in_port[i]->read().pri << " len:" << in_port[i]->read().len << endl;
 #endif
         };
     }
@@ -94,8 +94,8 @@ void mod_ing::port_rr_sch_process()
         rst_flag = false;
 
 #ifdef mod_ing_print
-        cout << "port_rr_sch_process..."
-             << "sch rslt flag: " << rst_flag << " sch rslt port id : " << rst_que << endl;
+//        cout << "port_rr_sch_process..."
+//             << "sch rslt flag: " << rst_flag << " sch rslt port id : " << rst_que << endl;
 #endif
     }
 }
@@ -120,7 +120,7 @@ void mod_ing::lut_process()
         if (iter != g_hash_rule_tab.end()) {
             flow_id = iter->second;
 #ifdef mod_ing_print
-            cout << "Fid " << flow_id << endl;
+//            cout << "Fid " << flow_id << endl;
 #endif
         }
 
@@ -129,7 +129,7 @@ void mod_ing::lut_process()
         que_id = flow_rule.qid;
         dport_id = flow_rule.dport;
 #ifdef mod_ing_print
-        cout << "que_id " << que_id << endl;
+ //       cout << "que_id " << que_id << endl;
 #endif
     };
 }
@@ -140,7 +140,7 @@ void mod_ing::pkt_to_cell_process()
     s_pkt_desc cell_trans;
     cell_sn = 0;
 
-    while (pkt_tmp_len >= G_CELL_LEN) {
+    while (pkt_tmp_len > G_CELL_LEN) {
         cell_trans = s_port_sch_result;
         cell_trans.type = 1;
         cell_trans.qid = que_id;
@@ -148,27 +148,21 @@ void mod_ing::pkt_to_cell_process()
         cell_trans.fid = flow_id;
         cell_trans.vldl = G_CELL_LEN;
         cell_trans.csn = cell_sn;
+        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt; 
         if (pkt_head_flag == 1) {
             cell_trans.sop = true;
         } else {
             cell_trans.sop = false;
         }
-        if (pkt_tmp_len == G_CELL_LEN) {
-            cell_trans.eop = true;
-            pkt_out_flag = 0;
-        } else {
-            cell_trans.eop = false;
-        }
-
-        out_cell_que.write(cell_trans);
+        out_cell_que.nb_write(cell_trans);
         pkt_tmp_len -= G_CELL_LEN;
         pkt_head_flag = 0;
         cell_sn++;
 #ifdef mod_ing_print
-        cout << "pkt_to_cell_process..."
-             << "cell_trans  : fsn: " << cell_trans.fsn << " sid: " << cell_trans.sid << " did: " << cell_trans.did
-             << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid << " dport: " << cell_trans.dport
-             << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " sop: " << cell_trans.sop << " eop: " << cell_trans.eop << endl;
+        cout << "cur_cycle" << g_cycle_cnt  << " ing_out_cell: "
+             << " type:" << cell_trans.type<< " fid:" << cell_trans.fid << " sid:" << cell_trans.sid << " did:" << cell_trans.did<< " fsn:" << cell_trans.fsn
+             << " pri:" << cell_trans.pri << " len:" << cell_trans.len<< " qid:" << cell_trans.qid  << " sport:" << cell_trans.sport<< " dport:" << cell_trans.dport
+             << " vldl:" << cell_trans.vldl << " csn:" << cell_trans.csn << " sop:" << cell_trans.sop << " eop:" << cell_trans.eop << endl;
 #endif
     }
     if (pkt_tmp_len > 0) {
@@ -179,23 +173,21 @@ void mod_ing::pkt_to_cell_process()
         cell_trans.fid = flow_id;
         cell_trans.vldl = pkt_tmp_len;
         cell_trans.csn = cell_sn;
+        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt;         
         if (pkt_head_flag == 1) {
             cell_trans.sop = true;
         } else {
             cell_trans.sop = false;
         }
-
-        cell_trans.sop = false;
         cell_trans.eop = true;
-        out_cell_que.write(cell_trans);
-
+        out_cell_que.nb_write(cell_trans);
         pkt_tmp_len = 0;
         pkt_out_flag = 0;
 #ifdef mod_ing_print
-        cout << "pkt_to_cell_process..."
-             << "cell_trans  : fsn: " << cell_trans.fsn << " sid: " << cell_trans.sid << " did: " << cell_trans.did
-             << " pri:" << cell_trans.pri << " qid: " << cell_trans.qid << " fid: " << cell_trans.fid << " dport: " << cell_trans.dport
-             << " vldl: " << cell_trans.vldl << " csn: " << cell_trans.csn << " sop: " << cell_trans.sop << " eop: " << cell_trans.eop << endl;
+        cout << "cur_cycle" << g_cycle_cnt  << " ing_out_cell: "
+             << " type:" << cell_trans.type<< " fid:" << cell_trans.fid << " sid:" << cell_trans.sid << " did:" << cell_trans.did<< " fsn:" << cell_trans.fsn
+             << " pri:" << cell_trans.pri << " len:" << cell_trans.len<< " qid:" << cell_trans.qid  << " sport:" << cell_trans.sport<< " dport:" << cell_trans.dport
+             << " vldl:" << cell_trans.vldl << " csn:" << cell_trans.csn << " sop:" << cell_trans.sop << " eop:" << cell_trans.eop << endl;
 #endif
     }
 }

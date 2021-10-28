@@ -18,12 +18,11 @@
 class mod_ing: public sc_module
 {
 public:
-    //sc_in<int> clkcnt;
-    // FIXME 临时编译修改
     sc_in<int> in_clk_cnt;
     std::array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_port;
     // output
-    sc_out<s_pkt_desc> out_cell_que;
+     sc_fifo_out<s_pkt_desc> out_cell_que;  
+//    sc_out<s_pkt_desc> out_cell_que;
 
 public:
     mod_ing(sc_module_name mod_ing);
