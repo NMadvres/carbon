@@ -186,6 +186,8 @@ void mod_sch::send_cell_to_pe(int que_id)
     for (int i = 0; i < cell_num; i++) {
         s_pkt_desc cur_cell = input_cell_que[que_id].front();
         input_cell_que[que_id].pop_front();
+        //增加时戳信息
+        cur_cell.time_stamp.sch_out_clock = g_cycle_cnt;
         out_cell_que.nb_write(cur_cell);
         cout << "cur_cycle" << g_cycle_cnt << "   send packet to PE " << cur_cell << endl;
         if (cur_cell.eop == true) {

@@ -149,6 +149,8 @@ void mod_stim ::stim_prc()
                 && (port_token_bucket[send_port].read_token() >= pkt_desc_tmp.len)) {
                 pkt_desc_tmp = port_fifo_inst[send_port].pkt_out();
                 port_token_bucket[send_port].sub_token(pkt_desc_tmp.len);
+                //增加时戳信息
+                pkt_desc_tmp.time_stamp.stm_out_clock = g_cycle_cnt;
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
                 cout << "@" << in_clk_cnt << "_clks stim sent =>:"
                      << "sport:" << send_port << pkt_desc_tmp << endl;

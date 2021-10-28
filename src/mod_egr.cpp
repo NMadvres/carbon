@@ -40,6 +40,8 @@ void mod_egr::send_pkt_process()
     s_pkt_desc &pkt = fifo_port.front();
 
     port_rule = g_port_rule_tab[pkt.dport];
+    //增加时戳信息
+    pkt.time_stamp.egr_out_clock = g_cycle_cnt;
     out_port[pkt.dport]->write(pkt);
     fifo_port.pop_front();
     (void)port_rule;

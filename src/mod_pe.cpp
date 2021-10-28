@@ -37,11 +37,6 @@ void mod_pe::on_recv_cell()
             return;
         }
 
-        if (pkt_que.size() == 2) {
-            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] queue full, drop it " << cell << std::endl;
-            return;
-        }
-
         // no pending packet
         if (pkt_que.empty() || pkt_que.back().type == DESC_TYPE_PKT) {
             if (!cell.sop) {
@@ -70,13 +65,17 @@ void mod_pe::on_recv_cell()
 
 void mod_pe::on_send_pkt()
 {
-    if (clk_wait) {
-        clk_wait--;
-        if (pkt_que.size() == 2 && !is_busy) {
+    // TODO add config
+    if (pkt_que.size() >= 2) {
+        fprintf(stderr, "%s:%d: pe queue full, drop it\n", __FUNCTION__, __LINE__);
+        if (!is_busy) {
             out_pe_busy.write(1);
             is_busy = true;
-            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] send busy" << std::endl;
         }
+    }
+
+    if (clk_wait) {
+        clk_wait--;
         return;
     }
 
@@ -94,6 +93,8 @@ void mod_pe::on_send_pkt()
     // edit packet
     pkt.len += g_flow_rule_tab[pkt.fid].len2add;
 
+    //增加时戳信息
+    pkt.time_stamp.pe_out_clock = g_cycle_cnt;
     out_cell_que.write(pkt);
     pkt_que.pop_front();
     std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] pkt go next " << pkt << std::endl;
@@ -101,8 +102,10 @@ void mod_pe::on_send_pkt()
     clk_wait = clk_gap - 1;
 
     if (is_busy) {
-        out_pe_busy.write(0);
-        is_busy = false;
-        std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] send no busy" << std::endl;
+        if (pkt_que.size() < 2) {
+            out_pe_busy.write(0);
+            is_busy = false;
+            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] send no busy" << std::endl;
+        }
     }
 }
