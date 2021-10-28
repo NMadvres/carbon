@@ -14,11 +14,21 @@ struct mod_stim: sc_module
     //端口
     sc_in<int> in_clk_cnt;
     std::array<sc_out<s_pkt_desc>, G_INTER_NUM> out_pkt_stim;
-    //  char* pkt_sender_filename;
-    char *pkt_sender_filename = (char *)"pkt_sender_file.log";
 
     //信号
+    //  char* pkt_sender_filename;
+    char *pkt_sender_filename = (char *)"pkt_sender_file.log";
     ofstream pkt_sender_file;
+    array<int, FLOW_RULE_TAB_SIZE> flow_sent_pkts;
+    array<int, FLOW_RULE_TAB_SIZE> flow_sent_bytes;
+    array<int, FLOW_RULE_TAB_SIZE> flow_dpd_pkts;
+    array<int, FLOW_RULE_TAB_SIZE> flow_dpd_bytes;
+    array<float, FLOW_RULE_TAB_SIZE> flow_sent_mbps;
+    array<int, G_INTER_NUM> port_sent_pkts;
+    array<int, G_INTER_NUM> port_sent_bytes;
+    array<int, G_INTER_NUM> port_dpd_pkts;
+    array<int, G_INTER_NUM> port_dpd_bytes;
+    array<float, G_INTER_NUM> port_sent_mbps;
 
     SC_CTOR(mod_stim)
     {
@@ -31,8 +41,22 @@ struct mod_stim: sc_module
 
     ~mod_stim()
     {
-        pkt_sender_file.flush();
-        pkt_sender_file.close();
+      for (int i = 0; i < FLOW_RULE_TAB_SIZE; i++){
+        pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total drop packets:" << flow_dpd_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total drop bytes  :" << flow_dpd_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total send packets:" << flow_sent_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total send bytes  :" << flow_sent_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] send speed(MBPS)  :" << flow_sent_mbps[i] << endl;
+      }
+      for (int i = 0; i < G_INTER_NUM; i++){
+        pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total drop packets:" << port_dpd_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total drop bytes  :" << port_dpd_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total send packets:" << port_sent_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total send bytes  :" << port_sent_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] send speed(MBPS)  :" << port_sent_mbps[i] << endl;
+      }
+      pkt_sender_file.flush();
+      pkt_sender_file.close();
     }
 
     void stim_prc();
