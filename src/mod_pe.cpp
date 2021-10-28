@@ -33,24 +33,19 @@ void mod_pe::on_recv_cell()
         in_cell_que.nb_read(cell);
 
         if (cell.type != DESC_TYPE_CELL) {
-            fprintf(stderr, "%s:%d: cell type error\n", __FUNCTION__, __LINE__);
+            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] cell type error " << cell << std::endl;
             return;
         }
 
-        // TODO add config
         if (pkt_que.size() == 2) {
-            fprintf(stderr, "%s:%d: pe queue full, drop it\n", __FUNCTION__, __LINE__);
-            if (!is_busy) {
-                out_pe_busy.write(1);
-                is_busy = true;
-            }
+            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] queue full, drop it " << cell << std::endl;
             return;
         }
 
         // no pending packet
         if (pkt_que.empty() || pkt_que.back().type == DESC_TYPE_PKT) {
             if (!cell.sop) {
-                fprintf(stderr, "%s:%d: sop error\n", __FUNCTION__, __LINE__);
+                std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] cell sop error " << cell << std::endl;
                 return;
             }
 
@@ -75,8 +70,13 @@ void mod_pe::on_recv_cell()
 
 void mod_pe::on_send_pkt()
 {
-    if (!clk_wait) {
+    if (clk_wait) {
         clk_wait--;
+        if (pkt_que.size() == 2 && !is_busy) {
+            out_pe_busy.write(1);
+            is_busy = true;
+            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] send busy" << std::endl;
+        }
         return;
     }
 
@@ -86,7 +86,7 @@ void mod_pe::on_send_pkt()
     s_pkt_desc &pkt = pkt_que.front();
 
     if (g_flow_rule_tab.size() < (unsigned int)pkt.fid) {
-        fprintf(stderr, "%s:%d: fid error\n", __FUNCTION__, __LINE__);
+        std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] pkt fid error " << pkt << std::endl;
         pkt_que.pop_front();
         return;
     }
@@ -96,11 +96,13 @@ void mod_pe::on_send_pkt()
 
     out_cell_que.write(pkt);
     pkt_que.pop_front();
+    std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] pkt go next " << pkt << std::endl;
 
     clk_wait = clk_gap - 1;
 
     if (is_busy) {
         out_pe_busy.write(0);
         is_busy = false;
+        std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] send no busy" << std::endl;
     }
 }
