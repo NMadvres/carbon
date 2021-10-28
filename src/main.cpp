@@ -42,5 +42,6 @@ int sc_main(int argc, char *argv[])
     top_carbon_mod.in_clk_cnt(cycle_cnt_sig);
 
     sc_start(100000, SC_NS); //启动仿真
+    top_tb_mod.stim_mod->~mod_stim();
     return 0;
 }

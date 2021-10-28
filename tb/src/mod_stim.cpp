@@ -4,7 +4,7 @@ void port_fifo::pkt_in(const s_pkt_desc &data_pkt)
 {
     regs[pntr++] = data_pkt;
     empty = false;
-    if (pntr == FLOW_RULE_TAB_SIZE)
+    if (pntr == (int)g_flow_rule_tab.size())
         full = true;
 }
 
@@ -15,7 +15,7 @@ s_pkt_desc port_fifo::pkt_out()
     if (--pntr == 0)
         empty = true;
     else
-        for (int i = 0; i < FLOW_RULE_TAB_SIZE; i++)
+        for (int i = 0; i < (int)g_flow_rule_tab.size(); i++)
             regs[i] = regs[i + 1];
     return (temp);
 }
@@ -57,12 +57,15 @@ void mod_stim ::stim_prc()
     int token_count;
     array<port_fifo, G_INTER_NUM> port_fifo_inst;
     array<token_bucket, G_INTER_NUM> port_token_bucket;
-    array<token_bucket, FLOW_RULE_TAB_SIZE> flow_token_bucket;
-    array<int, FLOW_RULE_TAB_SIZE> flow_sn;
+    vector<token_bucket> flow_token_bucket;
+    vector<int> flow_sn;
     s_pkt_desc pkt_desc_tmp;
 
     pkt_send_count = 0;
     token_count = 0;
+
+    flow_token_bucket.resize(g_flow_rule_tab.size());
+    flow_sn.resize(g_flow_rule_tab.size());
 
     for (int i = 0; i < G_INTER_NUM; i++) {
         port_fifo_inst[i].pntr = 0;
@@ -74,15 +77,15 @@ void mod_stim ::stim_prc()
         port_token_bucket[i].token = 0;
     }
 
-    for (int i = 0; i < FLOW_RULE_TAB_SIZE; i++) {
+    for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
         flow_token_bucket[i].token = 0;
     }
 
-    for (int i = 0; i < FLOW_RULE_TAB_SIZE; i++) {
+    for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
         flow_sn[i] = 0;
     }
 
-    wait(8);
+    wait(1);
     while (1) {
         if (token_count < G_FREQ_MHZ) {
             token_count++;
@@ -93,7 +96,7 @@ void mod_stim ::stim_prc()
                 port_token_bucket[i].add_token(125); // 1000Mbps=125MBPS
             }
             // add token to flow token bucket
-            for (int i = 0; i < FLOW_RULE_TAB_SIZE; i++) {
+            for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
                 flow_token_bucket[i].add_token(g_flow_rule_tab[i].flow_speed);
             }
         }
@@ -101,7 +104,7 @@ void mod_stim ::stim_prc()
         // generate desc packet per flow
         //        if (pkt_send_count < SEND_FILE_NUM)
         //        {
-        for (int fid = 0; fid < FLOW_RULE_TAB_SIZE; fid++) {
+        for (int fid = 0; fid < (int)g_flow_rule_tab.size(); fid++) {
             send_pkt_port = g_flow_rule_tab[fid].sport;
 
             pkt_desc_tmp.type = 0;
@@ -136,8 +139,8 @@ void mod_stim ::stim_prc()
                 }
                 pkt_send_count++;
             }
-            flow_sent_mbps[fid] = flow_sent_bytes[fid] / in_clk_cnt.read();
-            port_sent_mbps[send_pkt_port] = port_sent_bytes[send_pkt_port] / in_clk_cnt.read();
+            flow_sent_mbps[fid] = (flow_sent_bytes[fid] * G_FREQ_MHZ)/ in_clk_cnt;
+            port_sent_mbps[send_pkt_port] = (port_sent_bytes[send_pkt_port] * G_FREQ_MHZ) / in_clk_cnt;
         }
         //        }
 
@@ -149,8 +152,6 @@ void mod_stim ::stim_prc()
                 && (port_token_bucket[send_port].read_token() >= pkt_desc_tmp.len)) {
                 pkt_desc_tmp = port_fifo_inst[send_port].pkt_out();
                 port_token_bucket[send_port].sub_token(pkt_desc_tmp.len);
-                //增加时戳信息
-                pkt_desc_tmp.time_stamp.stm_out_clock = g_cycle_cnt;
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
                 cout << "@" << in_clk_cnt << "_clks stim sent =>:"
                      << "sport:" << send_port << pkt_desc_tmp << endl;
@@ -158,23 +159,6 @@ void mod_stim ::stim_prc()
                                 << "sport:" << send_port << pkt_desc_tmp;
             }
         }
-
-//        for (int i = 0; i < FLOW_RULE_TAB_SIZE; i++){
-//          pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total drop packets:" << flow_drop_pkt_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total drop bytes  :" << flow_drop_byte_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total send packets:" << flow_send_pkt_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] total send bytes  :" << flow_send_byte_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "flow [" << i << "] send speed(MBPS)  :" << flow_send_speed[i] << endl;
-//        }
-//
-//        for (int i = 0; i < G_INTER_NUM; i++){
-//          pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total drop packets:" << port_drop_pkt_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total drop bytes  :" << port_drop_byte_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total send packets:" << port_send_pkt_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] total send bytes  :" << port_send_byte_num[i] << endl;
-//          pkt_sender_file << "@" << in_clk_cnt << "port [" << i << "] send speed(MBPS)  :" << port_send_speed[i] << endl;
-//        }
-
 
         wait();
     }
