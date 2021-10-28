@@ -101,24 +101,14 @@ struct s_pkt_desc
                 && (rhs.qid == qid) && (rhs.vldl == vldl) && (rhs.csn == csn)
                 && (rhs.sop == sop) && (rhs.eop == eop));
     }
+
+    const char *to_string() const;
 };
 
-inline ostream &operator<<(ostream &os, const s_pkt_desc &a /* a */)
+inline ostream &operator<<(ostream &os, const s_pkt_desc &a)
 {
-    os << "[type:" << a.type;
-    os << ",fid:" << a.fid;
-    os << ",sid:" << a.sid;
-    os << ",did:" << a.did;
-    os << ",fsn:" << a.fsn;
-    os << ",len:" << a.len;
-    os << ",pri:" << a.pri;
-    os << ",sport:" << a.sport;
-    os << ",dport:" << a.dport;
-    os << ",qid:" << a.qid;
-    os << ",vldl:" << a.vldl;
-    os << ",csn:" << a.csn;
-    os << ",sop:" << a.sop;
-    os << ",eop:" << a.eop << "]" << endl;
+    os << a.to_string();
+
     return os;
 }
 
@@ -286,5 +276,12 @@ public:
 };
 
 #define ASSERT(A) (assert(A))
+
+#define MOD_LOG(...)                                                  \
+    do {                                                              \
+        fprintf(stdout, "[cycle@%d][%s]: ", g_cycle_cnt, this->name()); \
+        fprintf(stdout, __VA_ARGS__);                                 \
+        fprintf(stdout, "\n");                                        \
+    } while (0)
 
 #endif //__COMM_DEF_H__

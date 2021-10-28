@@ -33,14 +33,14 @@ void mod_pe::on_recv_cell()
         in_cell_que.nb_read(cell);
 
         if (cell.type != DESC_TYPE_CELL) {
-            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] cell type error " << cell << std::endl;
+            MOD_LOG("cell type error %s", cell.to_string());
             return;
         }
 
         // no pending packet
         if (pkt_que.empty() || pkt_que.back().type == DESC_TYPE_PKT) {
             if (!cell.sop) {
-                std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] cell sop error " << cell << std::endl;
+                MOD_LOG("cell sop error %s", cell.to_string());
                 return;
             }
 
@@ -66,12 +66,10 @@ void mod_pe::on_recv_cell()
 void mod_pe::on_send_pkt()
 {
     // TODO add config
-    if (pkt_que.size() >= 2) {
-        fprintf(stderr, "%s:%d: pe queue full, drop it\n", __FUNCTION__, __LINE__);
-        if (!is_busy) {
-            out_pe_busy.write(1);
-            is_busy = true;
-        }
+    if (pkt_que.size() >= 2 && !is_busy) {
+        out_pe_busy.write(1);
+        is_busy = true;
+        MOD_LOG("send busy");
     }
 
     if (clk_wait) {
@@ -85,7 +83,7 @@ void mod_pe::on_send_pkt()
     s_pkt_desc &pkt = pkt_que.front();
 
     if (g_flow_rule_tab.size() < (unsigned int)pkt.fid) {
-        std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] pkt fid error " << pkt << std::endl;
+        MOD_LOG("pkt fid error %s", pkt.to_string());
         pkt_que.pop_front();
         return;
     }
@@ -97,7 +95,7 @@ void mod_pe::on_send_pkt()
     pkt.time_stamp.pe_out_clock = g_cycle_cnt;
     out_cell_que.write(pkt);
     pkt_que.pop_front();
-    std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] pkt go next " << pkt << std::endl;
+    MOD_LOG("pkt go next %s", pkt.to_string());
 
     clk_wait = clk_gap - 1;
 
@@ -105,7 +103,7 @@ void mod_pe::on_send_pkt()
         if (pkt_que.size() < 2) {
             out_pe_busy.write(0);
             is_busy = false;
-            std::cout << "cur_cycle#" << g_cycle_cnt << " [PE] send no busy" << std::endl;
+            MOD_LOG("send no busy");
         }
     }
 }
