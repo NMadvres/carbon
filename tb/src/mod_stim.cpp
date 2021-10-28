@@ -139,7 +139,7 @@ void mod_stim ::stim_prc()
                 }
                 pkt_send_count++;
             }
-            flow_sent_mbps[fid] = (flow_sent_bytes[fid] * G_FREQ_MHZ)/ in_clk_cnt;
+            flow_sent_mbps[fid] = (flow_sent_bytes[fid] * G_FREQ_MHZ) / in_clk_cnt;
             port_sent_mbps[send_pkt_port] = (port_sent_bytes[send_pkt_port] * G_FREQ_MHZ) / in_clk_cnt;
         }
         //        }

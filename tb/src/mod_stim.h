@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 #define SEND_FILE_NUM 64
-#define FLOW_RULE_TAB_SIZE 16
+//#define FLOW_RULE_TAB_SIZE 16
 #define TOKEN_MAX_BYTE 125 * 100 * 2
 
 struct mod_stim: sc_module
@@ -52,22 +52,22 @@ struct mod_stim: sc_module
 
     ~mod_stim()
     {
-      for (int i = 0; i < (int)g_flow_rule_tab.size(); i++){
-        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total drop packets:" << flow_dpd_pkts[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total drop bytes  :" << flow_dpd_bytes[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send packets:" << flow_sent_pkts[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send bytes  :" << flow_sent_bytes[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] send speed(MBPS)  :" << flow_sent_mbps[i] << endl;
-      }
-      for (int i = 0; i < (int)g_flow_rule_tab.size(); i++){
-        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total drop packets:" << port_dpd_pkts[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total drop bytes  :" << port_dpd_bytes[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total send packets:" << port_sent_pkts[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total send bytes  :" << port_sent_bytes[i] << endl;
-        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] send speed(MBPS)  :" << port_sent_mbps[i] << endl;
-      }
-      pkt_sender_file.flush();
-      pkt_sender_file.close();
+        for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
+            pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total drop packets:" << flow_dpd_pkts[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total drop bytes  :" << flow_dpd_bytes[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send packets:" << flow_sent_pkts[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send bytes  :" << flow_sent_bytes[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] send speed(MBPS)  :" << flow_sent_mbps[i] << endl;
+        }
+        for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
+            pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total drop packets:" << port_dpd_pkts[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total drop bytes  :" << port_dpd_bytes[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total send packets:" << port_sent_pkts[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total send bytes  :" << port_sent_bytes[i] << endl;
+            pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] send speed(MBPS)  :" << port_sent_mbps[i] << endl;
+        }
+        pkt_sender_file.flush();
+        pkt_sender_file.close();
     }
 
     void stim_prc();
@@ -82,10 +82,10 @@ struct port_fifo
 
     port_fifo()
     {
-      regs.resize(g_flow_rule_tab.size());
-      full = false;
-      empty = true;
-      pntr = 0;
+        regs.resize(g_flow_rule_tab.size());
+        full = false;
+        empty = true;
+        pntr = 0;
     }
 
     void pkt_in(const s_pkt_desc &data_pkt);

@@ -56,11 +56,11 @@ void mod_ing::rev_pkt_process()
                 infifo_count_port[i]++;
             }
 #ifdef mod_ing_print
-            cout << "cur_cycle" << g_cycle_cnt  << " ing_in_pkt:"
-                << " port id: " << i << " pkts received: " << pkt_count_port[i]
-                << " pkts infifo: " << infifo_count_port[i] << " pkts dropped: " << drop_count_port[i]
-                << " fsn: " << in_port[i]->read().fsn << " sid: " << in_port[i]->read().sid << " did: " << in_port[i]->read().did
-                << " pri:" << in_port[i]->read().pri << " len:" << in_port[i]->read().len << endl;
+            cout << "cur_cycle" << g_cycle_cnt << " ing_in_pkt:"
+                 << " port id: " << i << " pkts received: " << pkt_count_port[i]
+                 << " pkts infifo: " << infifo_count_port[i] << " pkts dropped: " << drop_count_port[i]
+                 << " fsn: " << in_port[i]->read().fsn << " sid: " << in_port[i]->read().sid << " did: " << in_port[i]->read().did
+                 << " pri:" << in_port[i]->read().pri << " len:" << in_port[i]->read().len << endl;
 #endif
         };
     }
@@ -129,7 +129,7 @@ void mod_ing::lut_process()
         que_id = flow_rule.qid;
         dport_id = flow_rule.dport;
 #ifdef mod_ing_print
- //       cout << "que_id " << que_id << endl;
+        //       cout << "que_id " << que_id << endl;
 #endif
     };
 }
