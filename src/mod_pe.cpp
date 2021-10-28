@@ -18,7 +18,7 @@ mod_pe::mod_pe(sc_module_name name):
     assert(clk_gap > 0);
 
     SC_METHOD(on_recv_cell);
-    sensitive << in_cell_que;
+    sensitive << in_clk_cnt;
     dont_initialize();
 
     SC_METHOD(on_send_pkt);
@@ -28,45 +28,48 @@ mod_pe::mod_pe(sc_module_name name):
 
 void mod_pe::on_recv_cell()
 {
-    const s_pkt_desc &cell = in_cell_que.read();
+    while (in_cell_que.num_available()) {
+        s_pkt_desc cell;
+        in_cell_que.nb_read(cell);
 
-    if (cell.type != DESC_TYPE_CELL) {
-        fprintf(stderr, "%s:%d: cell type error\n", __FUNCTION__, __LINE__);
-        return;
-    }
-
-    // TODO add config
-    if (pkt_que.size() == 2) {
-        fprintf(stderr, "%s:%d: pe queue full, drop it\n", __FUNCTION__, __LINE__);
-        if (!is_busy) {
-            out_pe_busy.write(1);
-            is_busy = true;
-        }
-        return;
-    }
-
-    // no pending packet
-    if (pkt_que.empty() || pkt_que.back().type == DESC_TYPE_PKT) {
-        if (!cell.sop) {
-            fprintf(stderr, "%s:%d: sop error\n", __FUNCTION__, __LINE__);
+        if (cell.type != DESC_TYPE_CELL) {
+            fprintf(stderr, "%s:%d: cell type error\n", __FUNCTION__, __LINE__);
             return;
         }
 
-        pkt_que.push_back(cell);
-        pkt_que.back().len = 0;
-    }
+        // TODO add config
+        if (pkt_que.size() == 2) {
+            fprintf(stderr, "%s:%d: pe queue full, drop it\n", __FUNCTION__, __LINE__);
+            if (!is_busy) {
+                out_pe_busy.write(1);
+                is_busy = true;
+            }
+            return;
+        }
 
-    s_pkt_desc &pkt = pkt_que.back();
+        // no pending packet
+        if (pkt_que.empty() || pkt_que.back().type == DESC_TYPE_PKT) {
+            if (!cell.sop) {
+                fprintf(stderr, "%s:%d: sop error\n", __FUNCTION__, __LINE__);
+                return;
+            }
 
-    // append cell data here
-    pkt.len += cell.vldl;
+            pkt_que.push_back(cell);
+            pkt_que.back().len = 0;
+        }
 
-    if (cell.eop) {
-        pkt.type = DESC_TYPE_PKT;
-        pkt.vldl = -1;
-        pkt.csn = -1;
-        pkt.sop = -1;
-        pkt.eop = -1;
+        s_pkt_desc &pkt = pkt_que.back();
+
+        // append cell data here
+        pkt.len += cell.vldl;
+
+        if (cell.eop) {
+            pkt.type = DESC_TYPE_PKT;
+            pkt.vldl = -1;
+            pkt.csn = -1;
+            pkt.sop = -1;
+            pkt.eop = -1;
+        }
     }
 }
 

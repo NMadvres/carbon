@@ -30,7 +30,7 @@ mod_sch::mod_sch(sc_module_name name):
     fc_status = 0;
 
     SC_METHOD(rev_pkt_process); //接包处理
-    sensitive << in_cell_que;
+    sensitive << in_clk_cnt;
     dont_initialize();
 
     SC_METHOD(main_process); //调度发送处理
@@ -59,8 +59,11 @@ void mod_sch::main_process()
 ////////////////////////////////////////////////////////
 void mod_sch::rev_pkt_process()
 {
-    if (in_cell_que.event()) {
-        s_pkt_desc rd_pkt = in_cell_que.read();
+    while (in_cell_que.num_available()) {
+        s_pkt_desc rd_pkt;
+        bool flag = in_cell_que.nb_read(rd_pkt);
+        ASSERT(flag == true);
+
         int que_id = rd_pkt.qid;
         //增加状态判断，确定是否处于丢弃状态，对于SOP切片判断，如需丢弃则flag拉起
         cout << "cur_cycle" << g_cycle_cnt << "   recv ing packet " << rd_pkt << "que size" << input_cell_que[que_id].size() << endl;
@@ -183,7 +186,7 @@ void mod_sch::send_cell_to_pe(int que_id)
     for (int i = 0; i < cell_num; i++) {
         s_pkt_desc cur_cell = input_cell_que[que_id].front();
         input_cell_que[que_id].pop_front();
-        out_cell_que.write(cur_cell);
+        out_cell_que.nb_write(cur_cell);
         cout << "cur_cycle" << g_cycle_cnt << "   send packet to PE " << cur_cell << endl;
         if (cur_cell.eop == true) {
             break;

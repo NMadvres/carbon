@@ -25,8 +25,8 @@ public:
     mod_egr *egr_mod;
     std::array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_ing_port;   // 用于透传连线ing的输入端口信号,在顶层连接发包器
     std::array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_egr_port; // 用于透传连线egr的输出端口信号,在顶层连接stat
-    sc_signal<s_pkt_desc> ing_sch_sig;                          // 用于连接ing和sch
-    sc_signal<s_pkt_desc> sch_pe_sig;                           // 用于连接ing和sch
+    sc_fifo<s_pkt_desc> *ing_sch_sig;                           // 用于连接ing和sch
+    sc_fifo<s_pkt_desc> *sch_pe_sig;                            // 用于连接ing和sch
     sc_signal<s_pkt_desc> pe_egr_sig;                           // 用于连接ing和sch
     sc_signal<int> pe_sch_fc_sig;                               // 用于连接pe和sch,反压信号
     sc_in<int> in_clk_cnt;                                      // 全局时钟计数，用于互联
@@ -47,11 +47,13 @@ public: // 例化及互联部分
         }
 
         // 互联
-        ing_mod->out_cell_que(ing_sch_sig);
-        sch_mod->in_cell_que(ing_sch_sig); // 绑定ing和sch
+        ing_sch_sig = new sc_fifo<s_pkt_desc>(256);
+        ing_mod->out_cell_que(*ing_sch_sig);
+        sch_mod->in_cell_que(*ing_sch_sig); // 绑定ing和sch
 
-        sch_mod->out_cell_que(sch_pe_sig);
-        pe_mod->in_cell_que(sch_pe_sig); // 绑定sch和pe
+        sch_pe_sig = new sc_fifo<s_pkt_desc>(256);
+        sch_mod->out_cell_que(*sch_pe_sig);
+        pe_mod->in_cell_que(*sch_pe_sig); // 绑定sch和pe
 
         pe_mod->out_cell_que(pe_egr_sig);
         egr_mod->in_port(pe_egr_sig); // 绑定pe和egr

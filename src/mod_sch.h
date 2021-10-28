@@ -19,8 +19,8 @@ public:
     SC_HAS_PROCESS(mod_sch);
 
 public:
-    sc_in<s_pkt_desc> in_cell_que;
-    sc_out<s_pkt_desc> out_cell_que;
+    sc_fifo_in<s_pkt_desc> in_cell_que;
+    sc_fifo_out<s_pkt_desc> out_cell_que;
     sc_in<int> in_clk_cnt;
     vector<deque<s_pkt_desc>> input_cell_que;
     vector<int> input_drop_flag;

@@ -22,7 +22,7 @@ public:
     void on_send_pkt();
 
 public:
-    sc_in<s_pkt_desc> in_cell_que;
+    sc_fifo_in<s_pkt_desc> in_cell_que;
     sc_out<s_pkt_desc> out_cell_que;
     sc_in<int> in_clk_cnt;
     sc_out<int> out_pe_busy;
