@@ -73,8 +73,9 @@ struct mod_stim: sc_module
     void stim_prc();
 };
 
-struct port_fifo
+class port_fifo
 {
+    public:
     vector<s_pkt_desc> regs;
     bool full;
     bool empty;
@@ -88,13 +89,15 @@ struct port_fifo
         pntr = 0;
     }
 
+    public:
     void pkt_in(const s_pkt_desc &data_pkt);
     s_pkt_desc pkt_out();
     s_pkt_desc pkt_pre_val();
 };
 
-struct token_bucket
+class token_bucket
 {
+    public:
     int token;
 
     token_bucket()
@@ -102,6 +105,7 @@ struct token_bucket
         token = 0;
     }
 
+    public:
     void add_token(const int &add_token_val);
     void sub_token(const int &sub_token_val);
     int read_token();
