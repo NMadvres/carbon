@@ -35,9 +35,9 @@ public:
 
 private:
     s_pkt_desc s_port_sch_result;
-    int que_id;
+    int que_id = -1;
     int dport_id;
-    int flow_id;
+    int flow_id = -1;
     int pkt_tmp_len = 0;
     int pkt_out_flag = 0;
     int pkt_head_flag = 0;
@@ -47,6 +47,12 @@ private:
     std::array<int, G_INTER_NUM> pkt_count_port;
     std::array<int, G_INTER_NUM> infifo_count_port;
     std::array<int, G_INTER_NUM> drop_count_port;
+    std::array<int, G_INTER_NUM> dport_pkt_cnt;
+    std::array<int, G_INTER_NUM> dport_pkt_cell_cnt;
+    std::array<int, G_QUE_NUM> que_pkt_cnt;
+    std::array<int, G_QUE_NUM> que_pkt_cell_cnt;
+    std::array<int, 16> flow_pkt_cnt;
+    std::array<int, 16> flow_pkt_cell_cnt;
 
     RR_SCH *rr_sch;
 };
