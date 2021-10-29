@@ -15,6 +15,7 @@ mod_egr::mod_egr(sc_module_name name):
 {
     for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
+        port_send_bytes[i] = 0;
     }
     pkt_count_port = 0;
 

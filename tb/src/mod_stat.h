@@ -19,8 +19,34 @@ public:
     SC_HAS_PROCESS(mod_stat);
 
 public:
-    array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_pkt_stat;
+    std::array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_pkt_stat;
     sc_in<int> in_clk_cnt;
+    void stat_pkt_process();
+    void stat_flow_process(const s_pkt_desc *pkt);
+    void stat_sport_process(const s_pkt_desc *pkt);
+    void stat_dport_process(const s_pkt_desc *pkt);
+    void stat_priority_process(const s_pkt_desc *pkt);
+    void stat_qid_process(const s_pkt_desc *pkt);
+
+private:
+    std::array<std::deque<s_pkt_desc>, G_INTER_NUM> fifo_port;
+    char *pkt_receive_filename = (char *)"pkt_receive_file.log";
+    ofstream pkt_receive_file;
+
+    std::array<int, 16> in_flow_rev_pkt = {0};
+    std::array<int, 16> in_flow_rev_bytes = {0};
+
+    std::array<int, G_INTER_NUM> in_sport_rev_pkt = {0};
+    std::array<int, G_INTER_NUM> in_sport_rev_bytes = {0};
+
+    std::array<int, G_INTER_NUM> in_dport_rev_pkt = {0};
+    std::array<int, G_INTER_NUM> in_dport_rev_bytes = {0};
+
+    std::array<int, G_INTER_NUM> in_pri_rev_pkt = {0};
+    std::array<int, G_INTER_NUM> in_pri_rev_bytes = {0};
+
+    std::array<int, 16> in_qid_rev_pkt = {0};
+    std::array<int, 16> in_qid_rev_bytes = {0};
 };
 
 #endif // __MOD_STAT_H__
