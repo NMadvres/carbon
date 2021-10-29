@@ -27,5 +27,10 @@ public:
 
     std::deque<s_pkt_desc> fifo_port;
     int pkt_count_port;
+
+private:
+    std::array<int, G_INTER_NUM> port_send_bytes;
+    const int clk_gap;
+    int clk_wait;
 };
 #endif // __MOD_EGR_H__
