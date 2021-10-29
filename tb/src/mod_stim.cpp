@@ -50,6 +50,46 @@ int token_bucket::read_token()
     return (temp);
 }
 
+mod_stim::mod_stim(sc_module_name name):
+    sc_module(name)
+{
+    //    pkt_sender_file.open("pkt_sender_file.log");
+    pkt_sender_file.open(pkt_sender_filename);
+    flow_sent_pkts.resize(g_flow_rule_tab.size());
+    flow_sent_bytes.resize(g_flow_rule_tab.size());
+    flow_dpd_pkts.resize(g_flow_rule_tab.size());
+    flow_dpd_bytes.resize(g_flow_rule_tab.size());
+    flow_sent_mbps.resize(g_flow_rule_tab.size());
+    port_sent_pkts.resize(G_INTER_NUM);
+    port_sent_bytes.resize(G_INTER_NUM);
+    port_dpd_pkts.resize(G_INTER_NUM);
+    port_dpd_bytes.resize(G_INTER_NUM);
+    port_sent_mbps.resize(G_INTER_NUM);
+
+    SC_THREAD(stim_prc);
+    sensitive << in_clk_cnt;
+}
+
+mod_stim::~mod_stim()
+{
+    for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
+        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total drop packets:" << flow_dpd_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total drop bytes  :" << flow_dpd_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send packets:" << flow_sent_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send bytes  :" << flow_sent_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] send speed(MBPS)  :" << flow_sent_mbps[i] << endl;
+    }
+    for (int i = 0; i < G_INTER_NUM; i++) {
+        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total drop packets:" << port_dpd_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total drop bytes  :" << port_dpd_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total send packets:" << port_sent_pkts[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total send bytes  :" << port_sent_bytes[i] << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] send speed(MBPS)  :" << port_sent_mbps[i] << endl;
+    }
+    pkt_sender_file.flush();
+    pkt_sender_file.close();
+}
+
 void mod_stim::stim_prc()
 {
     int pkt_send_count;
@@ -157,7 +197,7 @@ void mod_stim::stim_prc()
                 cout << "@" << in_clk_cnt << "_clks stim sent =>:"
                      << "sport:" << send_port << pkt_desc_tmp << endl;
                 pkt_sender_file << "@" << in_clk_cnt << "_clks stim sent =>:"
-                                << "sport:" << send_port << pkt_desc_tmp;
+                                << "sport:" << send_port << pkt_desc_tmp << endl;
             }
         }
 
