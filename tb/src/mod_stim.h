@@ -9,8 +9,9 @@
 //#define FLOW_RULE_TAB_SIZE 16
 #define TOKEN_MAX_BYTE 125 * 100 * 2
 
-struct mod_stim: sc_module
+class mod_stim: public sc_module
 {
+    public:
     //端口
     sc_in<int> in_clk_cnt;
     std::array<sc_out<s_pkt_desc>, G_INTER_NUM> out_pkt_stim;
@@ -30,11 +31,12 @@ struct mod_stim: sc_module
     vector<int> port_dpd_bytes;
     vector<int> port_sent_mbps;
 
-    SC_CTOR(mod_stim)
+    public:
+    SC_HAS_PROCESS(mod_stim);
+    mod_stim(sc_module_name name):sc_module(name)
     {
         //    pkt_sender_file.open("pkt_sender_file.log");
         pkt_sender_file.open(pkt_sender_filename);
-
         flow_sent_pkts.resize(g_flow_rule_tab.size());
         flow_sent_bytes.resize(g_flow_rule_tab.size());
         flow_dpd_pkts.resize(g_flow_rule_tab.size());
@@ -45,10 +47,11 @@ struct mod_stim: sc_module
         port_dpd_pkts.resize(G_INTER_NUM);
         port_dpd_bytes.resize(G_INTER_NUM);
         port_sent_mbps.resize(G_INTER_NUM);
-
+        
         SC_THREAD(stim_prc);
         sensitive << in_clk_cnt;
     }
+    void stim_prc();
 
     ~mod_stim()
     {
@@ -69,8 +72,6 @@ struct mod_stim: sc_module
         pkt_sender_file.flush();
         pkt_sender_file.close();
     }
-
-    void stim_prc();
 };
 
 class port_fifo

@@ -50,7 +50,7 @@ int token_bucket::read_token()
     return (temp);
 }
 
-void mod_stim ::stim_prc()
+void mod_stim::stim_prc()
 {
     int pkt_send_count;
     int send_pkt_port;
