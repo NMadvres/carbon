@@ -14,12 +14,13 @@
 ////////////////////////////////////////////////////////
 class dummy_bcpu: public sc_module
 {
-public: // 例化及互联部分
-    sc_in<s_pkt_desc>  in_port_from_dut;        // 从 dut 的 egr 转发来的报文
-    sc_out<s_pkt_desc> out_port_to_stat;        // 报文透传到 stat 做统计
+public:                                  // 例化及互联部分
+    sc_in<s_pkt_desc> in_port_from_dut;  // 从 dut 的 egr 转发来的报文
+    sc_out<s_pkt_desc> out_port_to_stat; // 报文透传到 stat 做统计
 
 public:
-    dummy_bcpu(sc_module_name name):sc_module(name)
+    dummy_bcpu(sc_module_name name):
+        sc_module(name)
     {
         //透传
         out_port_to_stat = in_port_from_dut;

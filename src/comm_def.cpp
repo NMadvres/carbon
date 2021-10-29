@@ -10,12 +10,40 @@
 
 #include "comm_def.h"
 
+#define FMT_BUF_SIZE 512
+
 // 用于实现全局cycle_cnt计数
 
 std::vector<s_flow_rule> g_flow_rule_tab;
 std::unordered_map<s_hash_rule_key, int, has_rule_key_hash> g_hash_rule_tab;
 std::vector<s_tab_que> g_que_rule_tab;
 std::vector<s_tab_port> g_port_rule_tab;
+
+const char *s_pkt_desc::to_string() const
+{
+    static char buf[FMT_BUF_SIZE];
+
+    snprintf(buf, FMT_BUF_SIZE, "{"
+                                "type:%d,"
+                                "fid:%d,"
+                                "sid:%d,"
+                                "did:%d,"
+                                "fsn:%d,"
+                                "len:%d,"
+                                "pri:%d,"
+                                "sport:%d,"
+                                "dport:%d,"
+                                "qid:%d,"
+                                "vldl:%d,"
+                                "csn:%d,"
+                                "sop:%d,"
+                                "eop:%d"
+                                "}",
+             type, fid, sid, did, fsn, len, pri, sport, dport, qid, vldl, csn,
+             sop, eop);
+
+    return buf;
+}
 
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
