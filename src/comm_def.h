@@ -277,11 +277,11 @@ public:
 
 #define ASSERT(A) (assert(A))
 
-#define MOD_LOG(...)                                                  \
-    do {                                                              \
+#define MOD_LOG(...)                                                    \
+    do {                                                                \
         fprintf(stdout, "[cycle@%d][%s]: ", g_cycle_cnt, this->name()); \
-        fprintf(stdout, __VA_ARGS__);                                 \
-        fprintf(stdout, "\n");                                        \
+        fprintf(stdout, __VA_ARGS__);                                   \
+        fprintf(stdout, "\n");                                          \
     } while (0)
 
 #endif //__COMM_DEF_H__
