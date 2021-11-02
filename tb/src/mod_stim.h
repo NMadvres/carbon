@@ -30,6 +30,12 @@ public:
     vector<int> port_dpd_pkts;
     vector<int> port_dpd_bytes;
     vector<int> port_sent_mbps;
+    s_flow_rule flow_rule_nomatch;
+    int flow_nomatch_sent_pkts;
+    int flow_nomatch_sent_bytes;
+    int flow_nomatch_dpd_pkts;
+    int flow_nomatch_dpd_bytes;
+    int flow_nomatch_sent_mbps;
 
 public:
     mod_stim(sc_module_name name);
