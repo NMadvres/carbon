@@ -11,9 +11,9 @@
 ////////////////////////////////////////////////////////
 #include "mod_ing.h"
 
-//#define mod_ing_print
+#define mod_ing_print
 
-#define mod_ing_stat_print
+//#define mod_ing_stat_print
 
 mod_ing::mod_ing(sc_module_name name):
     sc_module(name)
