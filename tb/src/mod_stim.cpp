@@ -66,6 +66,16 @@ mod_stim::mod_stim(sc_module_name name):
     port_dpd_bytes.resize(G_INTER_NUM);
     port_sent_mbps.resize(G_INTER_NUM);
 
+    flow_rule_nomatch.sid = -1;
+    flow_rule_nomatch.did = 0;
+    flow_rule_nomatch.len = 64;
+    flow_rule_nomatch.pri = 0;
+    flow_rule_nomatch.sport = 3;
+    flow_rule_nomatch.dport = 0;
+    flow_rule_nomatch.qid = -1;
+    flow_rule_nomatch.len2add = -1;
+    flow_rule_nomatch.flow_speed = 10;
+
     SC_THREAD(stim_prc);
     sensitive << in_clk_cnt;
 }
@@ -78,6 +88,13 @@ mod_stim::~mod_stim()
         pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send packets:" << flow_sent_pkts[i] << endl;
         pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] total send bytes  :" << flow_sent_bytes[i] << endl;
         pkt_sender_file << "@" << in_clk_cnt << ":flow [" << i << "] send speed(MBPS)  :" << flow_sent_mbps[i] << endl;
+    }
+    if (1) {
+        pkt_sender_file << "@" << in_clk_cnt << ":flow no match total drop packets:" << flow_nomatch_dpd_pkts << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow no match total drop bytes  :" << flow_nomatch_dpd_bytes << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow no match total send packets:" << flow_nomatch_sent_pkts << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow no match total send bytes  :" << flow_nomatch_sent_bytes << endl;
+        pkt_sender_file << "@" << in_clk_cnt << ":flow no match send speed(MBPS)  :" << flow_nomatch_sent_mbps << endl;
     }
     for (int i = 0; i < G_INTER_NUM; i++) {
         pkt_sender_file << "@" << in_clk_cnt << ":port [" << i << "] total drop packets:" << port_dpd_pkts[i] << endl;
@@ -98,7 +115,9 @@ void mod_stim::stim_prc()
     array<port_fifo, G_INTER_NUM> port_fifo_inst;
     array<token_bucket, G_INTER_NUM> port_token_bucket;
     vector<token_bucket> flow_token_bucket;
+    token_bucket flow_nomatch_token_bucket;
     vector<int> flow_sn;
+    int flow_nomatch_sn;
     s_pkt_desc pkt_desc_tmp;
 
     pkt_send_count = 0;
@@ -120,10 +139,12 @@ void mod_stim::stim_prc()
     for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
         flow_token_bucket[i].token = 0;
     }
+    flow_nomatch_token_bucket.token = 0;
 
     for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
         flow_sn[i] = 0;
     }
+    flow_nomatch_sn = 0;
 
     wait(1);
     while (1) {
@@ -139,11 +160,10 @@ void mod_stim::stim_prc()
             for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
                 flow_token_bucket[i].add_token(g_flow_rule_tab[i].flow_speed);
             }
+            flow_nomatch_token_bucket.add_token(flow_rule_nomatch.flow_speed);
         }
 
         // generate desc packet per flow
-        //        if (pkt_send_count < SEND_FILE_NUM)
-        //        {
         for (int fid = 0; fid < (int)g_flow_rule_tab.size(); fid++) {
             send_pkt_port = g_flow_rule_tab[fid].sport;
 
@@ -182,7 +202,46 @@ void mod_stim::stim_prc()
             flow_sent_mbps[fid] = (flow_sent_bytes[fid] * G_FREQ_MHZ) / in_clk_cnt;
             port_sent_mbps[send_pkt_port] = (port_sent_bytes[send_pkt_port] * G_FREQ_MHZ) / in_clk_cnt;
         }
-        //        }
+//
+        // generate desc packet to bcpu
+        if (1) {
+            send_pkt_port = flow_rule_nomatch.sport;
+
+            pkt_desc_tmp.type = 0;
+            pkt_desc_tmp.fid = -1;
+            pkt_desc_tmp.sid = flow_rule_nomatch.sid;
+            pkt_desc_tmp.did = flow_rule_nomatch.did;
+            pkt_desc_tmp.fsn = flow_nomatch_sn;
+            pkt_desc_tmp.len = flow_rule_nomatch.len;
+            pkt_desc_tmp.pri = flow_rule_nomatch.pri;
+            pkt_desc_tmp.sport = flow_rule_nomatch.sport;
+            pkt_desc_tmp.dport = -1;
+            pkt_desc_tmp.qid = -1;
+            pkt_desc_tmp.vldl = -1;
+            pkt_desc_tmp.csn = -1;
+            pkt_desc_tmp.sop = false;
+            pkt_desc_tmp.eop = false;
+
+            if (flow_nomatch_token_bucket.read_token() >= pkt_desc_tmp.len) {
+                flow_nomatch_token_bucket.sub_token(pkt_desc_tmp.len);
+                if (port_fifo_inst[send_pkt_port].full == true) {
+                    flow_nomatch_dpd_pkts++;
+                    flow_nomatch_dpd_bytes = flow_nomatch_dpd_bytes + pkt_desc_tmp.len;
+                    port_dpd_pkts[send_pkt_port]++;
+                    port_dpd_bytes[send_pkt_port] = port_dpd_bytes[send_pkt_port] + pkt_desc_tmp.len;
+                } else {
+                    port_fifo_inst[send_pkt_port].pkt_in(pkt_desc_tmp);
+                    flow_nomatch_sn = flow_nomatch_sn + 1;
+                    flow_nomatch_sent_pkts++;
+                    flow_nomatch_sent_bytes = flow_nomatch_sent_bytes + pkt_desc_tmp.len;
+                    port_sent_pkts[send_pkt_port]++;
+                    port_sent_bytes[send_pkt_port] = port_sent_bytes[send_pkt_port] + pkt_desc_tmp.len;
+                }
+                pkt_send_count++;
+            }
+            flow_nomatch_sent_mbps = (flow_nomatch_sent_bytes * G_FREQ_MHZ) / in_clk_cnt;
+            port_sent_mbps[send_pkt_port] = (port_sent_bytes[send_pkt_port] * G_FREQ_MHZ) / in_clk_cnt;
+        }
 
         // output desc packet to each port
         for (int send_port = 0; send_port < G_INTER_NUM; send_port++) {
