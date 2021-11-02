@@ -11,9 +11,9 @@
 ////////////////////////////////////////////////////////
 #include "mod_ing.h"
 
-#define mod_ing_print
+//#define mod_ing_print
 
-//#define mod_ing_stat_print
+#define mod_ing_stat_print
 
 mod_ing::mod_ing(sc_module_name name):
     sc_module(name)
@@ -115,11 +115,10 @@ void mod_ing::lut_process()
         auto iter = g_hash_rule_tab.find(hash_pkt_lut_key);
         if (iter != g_hash_rule_tab.end()) {
             flow_id = iter->second;
+            flow_rule = g_flow_rule_tab[flow_id];
+            que_id = flow_rule.qid;
+            dport_id = flow_rule.dport;
         }
-
-        flow_rule = g_flow_rule_tab[flow_id];
-        que_id = flow_rule.qid;
-        dport_id = flow_rule.dport;
     };
 }
 
