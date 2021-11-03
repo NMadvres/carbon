@@ -154,7 +154,7 @@ void mod_stim::stim_prc()
             token_count = 0;
             // add token to port token bucket
             for (int i = 0; i < G_INTER_NUM; i++) {
-                port_token_bucket[i].add_token(125); // 1000Mbps=125MBPS
+                port_token_bucket[i].add_token(g_port_rule_tab[i]); // 1000Mbps=125MBPS
             }
             // add token to flow token bucket
             for (int i = 0; i < (int)g_flow_rule_tab.size(); i++) {
