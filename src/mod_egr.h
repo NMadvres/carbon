@@ -12,6 +12,9 @@
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
+
+#define TOKEN_MAX_BYTE 125 * 100 * 2
+
 class mod_egr: public sc_module
 {
 public:
@@ -30,7 +33,12 @@ public:
 
 private:
     std::array<int, G_INTER_NUM> port_send_bytes;
+    std::array<int, G_INTER_NUM> port_token_bucket = {0};
     const int clk_gap;
-    int clk_wait;
+
+public:
+    void add_token(const int &add_token_val, const int port);
+    void sub_token(const int &add_token_val, const int port);
+    int get_token(const int port);
 };
 #endif // __MOD_EGR_H__

@@ -10,14 +10,12 @@
 ////////////////////////////////////////////////////////
 mod_egr::mod_egr(sc_module_name name):
     sc_module(name),
-    clk_gap(G_FREQ_MHZ),
-    clk_wait(0)
+    clk_gap(G_FREQ_MHZ)
 {
     for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
-        port_send_bytes[i] = 0;
+        port_token_bucket[i] = port_token_bucket[i];
     }
-    pkt_count_port = 0;
 
     assert(clk_gap > 0);
 
@@ -30,37 +28,49 @@ mod_egr::mod_egr(sc_module_name name):
     dont_initialize();
 }
 
+void mod_egr::add_token(const int &add_token_val, const int port)
+{
+    if ((port_token_bucket[port] + add_token_val) > TOKEN_MAX_BYTE)
+        port_token_bucket[port] = TOKEN_MAX_BYTE;
+    else
+        port_token_bucket[port] = port_token_bucket[port] + add_token_val;
+}
+
+void mod_egr::sub_token(const int &sub_token_val, const int port)
+{
+    if ((port_token_bucket[port] - sub_token_val) < 0)
+        port_token_bucket[port] = 0;
+    else
+        port_token_bucket[port] = port_token_bucket[port] - sub_token_val;
+}
+
+int mod_egr::get_token(const int port)
+{
+    return port_token_bucket[port];
+}
+
 void mod_egr::rev_pkt_process()
 {
     fifo_port.push_back(in_port->read());
-    pkt_count_port++;
 }
 
 void mod_egr::send_pkt_process()
 {
-    s_tab_port port_rule;
-
-    if (clk_wait) {
-        clk_wait--;
-        return;
-    }
-
     if (fifo_port.empty())
         return;
-    s_pkt_desc &pkt = fifo_port.front();
 
-    port_rule = g_port_rule_tab[pkt.dport];
+    s_pkt_desc &pkt = fifo_port.front();
+    add_token(pkt.len, pkt.dport);
+
+    port_token_bucket[pkt.dport] = g_port_rule_tab[pkt.dport];
+    if ((pkt.len > get_token(pkt.dport)))
+        return;
 
     //增加时戳信息
     pkt.time_stamp.egr_out_clock = g_cycle_cnt;
     port_send_bytes[pkt.dport] += pkt.len;
-    if (clk_gap <= port_send_bytes[pkt.dport] * G_FREQ_MHZ / in_clk_cnt) {
-        clk_wait = clk_gap;
-        port_send_bytes[pkt.dport] = 0;
-        return;
-    }
 
     out_port[pkt.dport]->write(pkt);
     fifo_port.pop_front();
-    (void)port_rule;
+    sub_token(pkt.len, pkt.dport);
 }
