@@ -16,20 +16,30 @@ int sc_main(int argc, char *argv[])
 {
     //全局计数器生成
     sc_clock clk("clk", 10, SC_NS); //10ns一个周期，100MHZ
-                                    //   glb_cfg_c glb_cfg("temp_testcase.tab");
-    string test_tc;
-    if (argc > 1) {
-        test_tc = argv[1];
-    } else {
-        test_tc = "TC_LEN_001";
+    //   glb_cfg_c glb_cfg("temp_testcase.tab");
+    string glb_cfg_file;
+    string print_file;
+    if (argc == 2) {
+        glb_cfg_file = string("./tb/tc/") + argv[1] + string(".tab");
+        cout << glb_cfg_file << endl;
+        print_file = argv[1];
     }
-    string glb_cfg_file = string("./tb/tc/") + test_tc + string(".tab");
-    cout << glb_cfg_file << endl;
+
+    if (argc == 1) {
+        glb_cfg_file = string("temp_testcase") + string(".tab");
+        print_file = string("temp_testcase");
+    }
+    print_file = print_file + string(".stat");
+    cout << print_file << endl;
+
     glb_cfg_c glb_cfg(glb_cfg_file);
 
+    //例化统计类
+    func_stat *top_stat = new func_stat(print_file, Module_top);
+
     //子模块例化
-    top_carbon top_carbon_mod("top_carbon");
-    top_tb top_tb_mod("top_tb");
+    top_carbon top_carbon_mod("top_carbon", top_stat);
+    top_tb top_tb_mod("top_tb", top_stat);
     //顶层绑定
     array<sc_signal<s_pkt_desc> *, G_INTER_NUM> tb_ing_sig;
     array<sc_signal<s_pkt_desc> *, G_INTER_NUM> egr_tb_sig;
@@ -38,6 +48,7 @@ int sc_main(int argc, char *argv[])
         egr_tb_sig[i] = new sc_signal<s_pkt_desc>();
         (*top_carbon_mod.in_ing_port[i])(*tb_ing_sig[i]);
         (*top_carbon_mod.out_egr_port[i])(*egr_tb_sig[i]);
+        (*top_tb_mod.in_pkt_stat[i])(*egr_tb_sig[i]);
         (*top_tb_mod.out_pkt_stim[i])(*tb_ing_sig[i]);
     }
     //绑定入口主时钟
@@ -50,5 +61,7 @@ int sc_main(int argc, char *argv[])
 
     sc_start(1000, SC_US); //启动仿真
     top_tb_mod.stim_mod->~mod_stim();
+    int simu_cycle = 1000 * 1000 / 10;
+    top_stat->print_info(simu_cycle);
     return 0;
 }

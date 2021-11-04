@@ -63,11 +63,6 @@ void mod_egr::rev_pkt_process()
 
 void mod_egr::send_pkt_process()
 {
-    //for print
-    int a = in_clk_cnt.read();
-    if ((a != 0) && (a % 10000 == 0)) {
-        top_stat->print_info(10000);
-    }
     if (fifo_port.empty())
         return;
 

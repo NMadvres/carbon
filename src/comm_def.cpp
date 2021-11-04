@@ -463,7 +463,7 @@ void func_stat_base::print_info(int stat_period)
         ASSERT(0);
     }
     print_cnt++;
-    fprintf(m_fp, "\n---------------------cur_time:%8d----------------------------------\n", stat_period * print_cnt);
+    //fprintf(m_fp, "\n---------------------cur_time:%8d----------------------------------\n", stat_period * print_cnt);
     int send_bytes;
     double send_mbps;
     int send_pkts;
