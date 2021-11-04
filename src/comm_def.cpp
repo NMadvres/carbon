@@ -390,7 +390,7 @@ func_stat_base::func_stat_base(string file_name, Module_TYPE mod_name, Stat_BASE
         pre_print_name = "dport";
         break;
     case fqid_level:
-        pre_print_name = "fqid";
+        pre_print_name = "fid";
         break;
     case que_level:
         pre_print_name = "que";
