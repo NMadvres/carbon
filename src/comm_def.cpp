@@ -363,7 +363,7 @@ bool SP_SCH::get_sch_result(int &rst_que)
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
 
-func_stat_base::func_stat_base(string file_name, Module_TYPE mod_name, Stat_BASE stat_base_on, int que_num)
+func_stat_base::func_stat_base(string file_name, MODULE_TYPE mod_name, Stat_BASE stat_base_on, int que_num)
 {
     m_file_name = "run_log/" + file_name;
     m_que_num = que_num;
@@ -389,11 +389,11 @@ func_stat_base::func_stat_base(string file_name, Module_TYPE mod_name, Stat_BASE
     case dport_level:
         pre_print_name = "dport";
         break;
-    case fqid_level:
-        pre_print_name = "fqid";
+    case fid_level:
+        pre_print_name = "fid";
         break;
     case que_level:
-        pre_print_name = "que";
+        pre_print_name = "qid";
         break;
     case pri_level:
         pre_print_name = "pri";
@@ -477,8 +477,8 @@ void func_stat_base::print_info(int stat_period)
     int avg_dly;
     int min_dly;
     int max_dly;
-    fprintf(m_fp, "%-10s    send_bytes    send_mbps   send_pkts   send_mpps   rcvd_bytes  rcvd_mbps   rcvd_pkts   rcvd_mpps   dpd_pkts    dpd_mpps    avg_dly     min_dly    max_dly  \n",
-            pre_print_name.c_str());
+    fprintf(m_fp, "%-10s    send_bytes    send_mbps   send_pkts   send_mpps   rcvd_bytes  rcvd_mbps   rcvd_pkts   rcvd_mpps   dpd_pkts    dpd_mpps    avg_dly     min_dly    max_dly  %c",
+            pre_print_name.c_str(), 13);
     for (int i = 0; i < m_que_num; i++) {
         //计算que带宽bps和PPS，基于que计算
         send_bytes = output_que_pktlen_stat[i];                                   // send_bytes
@@ -495,13 +495,13 @@ void func_stat_base::print_info(int stat_period)
         min_dly = record_min_delay;
         max_dly = record_max_delay;
 
-        fprintf(m_fp, "%-10d    %-10d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8d    %-8d\n",
-                i, send_bytes, send_mbps, send_pkts, send_mpps, rcvd_bytes, rcvd_mbps, rcvd_pkts, rcvd_mpps, dpd_pkts, dpd_mpps, avg_dly, min_dly, max_dly);
+        fprintf(m_fp, "%-10d    %-10d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8d    %-8d  %c",
+                i, send_bytes, send_mbps, send_pkts, send_mpps, rcvd_bytes, rcvd_mbps, rcvd_pkts, rcvd_mpps, dpd_pkts, dpd_mpps, avg_dly, min_dly, max_dly, 13);
         //清零
         input_que_pktlen_stat[i] = 0;
         output_que_pktlen_stat[i] = 0;
     }
-    fprintf(m_fp, "\n\n\n");
+    fprintf(m_fp, "%c", 13);
 
     fclose(m_fp);
 }
@@ -515,11 +515,11 @@ void func_stat_base::print_info(int stat_period)
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-func_stat::func_stat(string file_name, Module_TYPE base_mod_name)
+func_stat::func_stat(string file_name, MODULE_TYPE base_mod_name)
 {
     mod_name = base_mod_name;
     string file_add;
-    fqid_enable_flag = 0;
+    fid_enable_flag = 0;
     que_enable_flag = 0;
     pri_enable_flag = 0;
     sport_enable_flag = 0;
@@ -528,33 +528,35 @@ func_stat::func_stat(string file_name, Module_TYPE base_mod_name)
     case Module_stim:
         file_add = "_stim";
         sport_enable_flag = 1;
-        fqid_enable_flag = 1;
+        fid_enable_flag = 1;
         break;
     case Module_ing:
         file_add = "_ing";
         sport_enable_flag = 1;
-        fqid_enable_flag = 1;
+        fid_enable_flag = 1;
         break;
     case Module_sch:
         file_add = "_sch";
         pri_enable_flag = 1;
-        fqid_enable_flag = 1;
+        fid_enable_flag = 1;
         break;
     case Module_pe:
         file_add = "_pe";
         dport_enable_flag = 1;
-        fqid_enable_flag = 1;
+        fid_enable_flag = 1;
         break;
     case Module_egr:
         file_add = "_egr";
         dport_enable_flag = 1;
-        fqid_enable_flag = 1;
+        fid_enable_flag = 1;
         break;
     case Module_top:
         file_add = "_top";
         sport_enable_flag = 1;
         dport_enable_flag = 1;
-        fqid_enable_flag = 1;
+        fid_enable_flag = 1;
+        que_enable_flag = 1;
+        pri_enable_flag = 1;
         break;
     }
     //file_name = file_name + file_add;
@@ -566,7 +568,7 @@ func_stat::func_stat(string file_name, Module_TYPE base_mod_name)
     port_size = g_port_rule_tab.size();
 
     //例化统计子控件
-    fqid_stat = new func_stat_base(file_name, mod_name, fqid_level, fid_size);
+    fid_stat = new func_stat_base(file_name, mod_name, fid_level, fid_size);
     que_stat = new func_stat_base(file_name, mod_name, que_level, que_size);
     pri_stat = new func_stat_base(file_name, mod_name, pri_level, pri_size);
     sport_stat = new func_stat_base(file_name, mod_name, sport_level, port_size);
@@ -575,8 +577,8 @@ func_stat::func_stat(string file_name, Module_TYPE base_mod_name)
 
 void func_stat::input_comm_stat_func(s_pkt_desc pkt_stat)
 {
-    if (fqid_enable_flag == 1) {
-        fqid_stat->input_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
+    if (fid_enable_flag == 1) {
+        fid_stat->input_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
     }
     if (que_enable_flag == 1) {
         if (mod_name == Module_sch) {
@@ -602,8 +604,8 @@ void func_stat::input_comm_stat_func(s_pkt_desc pkt_stat)
 
 void func_stat::output_comm_stat_func(s_pkt_desc pkt_stat)
 {
-    if (fqid_enable_flag == 1) {
-        fqid_stat->output_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
+    if (fid_enable_flag == 1) {
+        fid_stat->output_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
     }
     if (que_enable_flag == 1) {
         if (mod_name == Module_sch) {
@@ -629,8 +631,8 @@ void func_stat::output_comm_stat_func(s_pkt_desc pkt_stat)
 
 void func_stat::drop_comm_stat_func(s_pkt_desc pkt_stat)
 {
-    if (fqid_enable_flag == 1) {
-        fqid_stat->drop_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
+    if (fid_enable_flag == 1) {
+        fid_stat->drop_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
     }
     if (que_enable_flag == 1) {
         que_stat->drop_record_bw_info(pkt_stat.qid, pkt_stat.len, pkt_stat.eop);
@@ -648,8 +650,8 @@ void func_stat::drop_comm_stat_func(s_pkt_desc pkt_stat)
 
 void func_stat::record_comm_latency_func(int delay_cnt)
 {
-    if (fqid_enable_flag == 1) {
-        fqid_stat->record_latency_info(delay_cnt);
+    if (fid_enable_flag == 1) {
+        fid_stat->record_latency_info(delay_cnt);
     }
     if (que_enable_flag == 1) {
         que_stat->record_latency_info(delay_cnt);
@@ -666,19 +668,19 @@ void func_stat::record_comm_latency_func(int delay_cnt)
 }
 void func_stat::print_info(int stat_period)
 {
-    if (fqid_enable_flag == 1) {
-        fqid_stat->print_info(stat_period);
-    }
-    if (que_enable_flag == 1) {
-        que_stat->print_info(stat_period);
-    }
-    if (pri_enable_flag == 1) {
-        pri_stat->print_info(stat_period);
+    if (fid_enable_flag == 1) {
+        fid_stat->print_info(stat_period);
     }
     if (sport_enable_flag == 1) {
         sport_stat->print_info(stat_period);
     }
     if (dport_enable_flag == 1) {
         dport_stat->print_info(stat_period);
+    }
+    if (pri_enable_flag == 1) {
+        pri_stat->print_info(stat_period);
+    }
+    if (que_enable_flag == 1) {
+        que_stat->print_info(stat_period);
     }
 }

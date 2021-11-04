@@ -20,7 +20,7 @@ class top_tb: public sc_module
 public: // 例化及互联部分
     mod_stim *stim_mod;
     mod_stat *stat_mod;
-    mod_testcrtl *testcrtl_mod;
+    mod_testctrl *testctrl_mod;
     array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_pkt_stat;   //用于透传连线stat的输入端口信号,在顶层连接egr
     array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_pkt_stim; //用于透传连线stim的输出端口信号,在顶层连接ing
     sc_in_clk in_glb_clk;                                  // 用于透传连线testctrl输入信号,在顶层连接testctrl
@@ -34,7 +34,7 @@ public:
         //例化
         stim_mod = new mod_stim("stim_mod", base_top_stat);
         stat_mod = new mod_stat("stat_mod");
-        testcrtl_mod = new mod_testcrtl("mod_testcrtl");
+        testctrl_mod = new mod_testctrl("mod_testctrl");
         for (int i = 0; i < G_INTER_NUM; i++) {
             in_pkt_stat[i] = new sc_in<s_pkt_desc>();
             out_pkt_stim[i] = new sc_out<s_pkt_desc>();
@@ -45,8 +45,8 @@ public:
             (stim_mod->out_pkt_stim[i])(*out_pkt_stim[i]);
             stat_mod->in_pkt_stat[i]->bind(*in_pkt_stat[i]);
         }
-        testcrtl_mod->in_glb_clk(in_glb_clk); //透传clk连线
-        testcrtl_mod->out_clk_cnt(out_clk_cnt);
+        testctrl_mod->in_glb_clk(in_glb_clk); //透传clk连线
+        testctrl_mod->out_clk_cnt(out_clk_cnt);
         //cycle计数信号透传
         stim_mod->in_clk_cnt(in_clk_cnt);
         stat_mod->in_clk_cnt(in_clk_cnt);

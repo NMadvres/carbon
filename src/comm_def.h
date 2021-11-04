@@ -277,7 +277,7 @@ public:
 
 //STAT 函数相关
 //STAT 函数相关
-enum Module_TYPE
+enum MODULE_TYPE
 {
     Module_stim = 0,
     Module_ing = 1,
@@ -291,7 +291,7 @@ enum Stat_BASE
 {
     sport_level = 0,
     dport_level = 1,
-    fqid_level = 2,
+    fid_level = 2,
     que_level = 3,
     pri_level = 4
 };
@@ -299,7 +299,7 @@ enum Stat_BASE
 class func_stat_base
 {
 public:
-    func_stat_base(string file_name, Module_TYPE mod_name, Stat_BASE stat_base_on, int que_num);
+    func_stat_base(string file_name, MODULE_TYPE mod_name, Stat_BASE stat_base_on, int que_num);
 
 public:
     int m_que_num;
@@ -331,7 +331,7 @@ public:
 class func_stat
 {
 public:
-    func_stat(string file_name, Module_TYPE base_mod_name);
+    func_stat(string file_name, MODULE_TYPE base_mod_name);
     void input_comm_stat_func(s_pkt_desc pkt_stat);
     void output_comm_stat_func(s_pkt_desc pkt_stat);
     void drop_comm_stat_func(s_pkt_desc pkt_stat);
@@ -339,12 +339,12 @@ public:
     void print_info(int stat_period);
 
 public:
-    func_stat_base *fqid_stat;
+    func_stat_base *fid_stat;
     func_stat_base *que_stat;
     func_stat_base *pri_stat;
     func_stat_base *sport_stat;
     func_stat_base *dport_stat;
-    int fqid_enable_flag;
+    int fid_enable_flag;
     int que_enable_flag;
     int pri_enable_flag;
     int sport_enable_flag;
@@ -353,7 +353,7 @@ public:
     int fid_size;
     int port_size;
     int pri_size;
-    Module_TYPE mod_name;
+    MODULE_TYPE mod_name;
     static func_stat *global_init_stat;
 };
 
