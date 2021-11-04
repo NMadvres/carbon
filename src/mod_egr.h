@@ -2,7 +2,6 @@
 #define __MOD_EGR_H__
 
 #include "comm_def.h"
-#include "../tb/src/mod_stat.h"
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_ing
@@ -18,7 +17,7 @@
 class mod_egr: public sc_module
 {
 public:
-    mod_egr(sc_module_name name);
+    mod_egr(sc_module_name name, func_stat *base_top_stat);
     SC_HAS_PROCESS(mod_egr);
     void rev_pkt_process(void);
     void send_pkt_process(void);
@@ -30,7 +29,7 @@ public:
 
     std::deque<s_pkt_desc> fifo_port;
     int pkt_count_port;
-    mod_stat *top_stat;
+    func_stat *top_stat;
 
 private:
     std::array<int, G_INTER_NUM> port_send_bytes;

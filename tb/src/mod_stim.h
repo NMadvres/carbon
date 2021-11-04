@@ -36,9 +36,10 @@ public:
     int flow_nomatch_dpd_pkts;
     int flow_nomatch_dpd_bytes;
     int flow_nomatch_sent_mbps;
+    func_stat *top_stat;
 
 public:
-    mod_stim(sc_module_name name);
+    mod_stim(sc_module_name name, func_stat *base_top_stat);
     SC_HAS_PROCESS(mod_stim);
     ~mod_stim();
 

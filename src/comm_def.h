@@ -275,6 +275,88 @@ public:
     bool get_sch_result(int &rst_que);
 };
 
+//STAT 函数相关
+//STAT 函数相关
+enum Module_TYPE
+{
+    Module_stim = 0,
+    Module_ing = 1,
+    Module_sch = 2,
+    Module_pe = 3,
+    Module_egr = 4,
+    Module_top = 5
+};
+
+enum Stat_BASE
+{
+    sport_level = 0,
+    dport_level = 1,
+    fqid_level = 2,
+    que_level = 3,
+    pri_level = 4
+};
+
+class func_stat_base
+{
+public:
+    func_stat_base(string file_name, Module_TYPE mod_name, Stat_BASE stat_base_on, int que_num);
+
+public:
+    int m_que_num;
+    //delay relate
+    int record_cycle;
+    int record_max_delay;
+    int record_min_delay;
+    int record_avg_delay;
+    int record_delay_cnt;
+    //bw relate
+    int print_cnt;
+    vector<int> input_que_pktlen_stat;
+    vector<int> input_que_pktnum_stat;
+    vector<int> output_que_pktlen_stat;
+    vector<int> output_que_pktnum_stat;
+    vector<int> drop_que_pktnum_stat;
+    string m_file_name;
+    FILE *m_fp;
+    string pre_print_name;
+
+public:
+    void input_record_bw_info(int que_id, int valid_len, int is_eop);
+    void output_record_bw_info(int que_id, int valid_len, int is_eop);
+    void drop_record_bw_info(int que_id, int valid_len, int is_eop);
+    void record_latency_info(int delay_cnt);
+    void print_info(int stat_period);
+};
+
+class func_stat
+{
+public:
+    func_stat(string file_name, Module_TYPE base_mod_name);
+    void input_comm_stat_func(s_pkt_desc pkt_stat);
+    void output_comm_stat_func(s_pkt_desc pkt_stat);
+    void drop_comm_stat_func(s_pkt_desc pkt_stat);
+    void record_comm_latency_func(int delay_cnt);
+    void print_info(int stat_period);
+
+public:
+    func_stat_base *fqid_stat;
+    func_stat_base *que_stat;
+    func_stat_base *pri_stat;
+    func_stat_base *sport_stat;
+    func_stat_base *dport_stat;
+    int fqid_enable_flag;
+    int que_enable_flag;
+    int pri_enable_flag;
+    int sport_enable_flag;
+    int dport_enable_flag;
+    int que_size;
+    int fid_size;
+    int port_size;
+    int pri_size;
+    Module_TYPE mod_name;
+    static func_stat *global_init_stat;
+};
+
 #define ASSERT(A) (assert(A))
 
 #define MOD_LOG(...)                                                    \

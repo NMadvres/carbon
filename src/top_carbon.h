@@ -32,14 +32,14 @@ public:
     sc_in<int> in_clk_cnt;                                      // 全局时钟计数，用于互联
 
 public: // 例化及互联部分
-    top_carbon(sc_module_name name):
+    top_carbon(sc_module_name name, func_stat *base_top_stat):
         sc_module(name)
     {
         // 例化
         ing_mod = new mod_ing("mod_ing");
         sch_mod = new mod_sch("mod_sch");
         pe_mod = new mod_pe("mod_pe");
-        egr_mod = new mod_egr("mod_egr");
+        egr_mod = new mod_egr("mod_egr", base_top_stat);
 
         for (int i = 0; i < G_INTER_NUM; i++) {
             in_ing_port[i] = new sc_in<s_pkt_desc>();

@@ -30,7 +30,7 @@ mod_sch::mod_sch(sc_module_name name):
     fc_status = 0;
 
     //for stat
-    sch_stat = new mod_stat("detail_info", Module_sch);
+    sch_stat = new func_stat("sch_detail_info", Module_sch);
 
     SC_METHOD(rev_pkt_process); //接包处理
     sensitive << in_clk_cnt;

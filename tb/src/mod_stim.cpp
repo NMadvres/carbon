@@ -50,9 +50,10 @@ int token_bucket::read_token()
     return (temp);
 }
 
-mod_stim::mod_stim(sc_module_name name):
+mod_stim::mod_stim(sc_module_name name, func_stat *base_top_stat):
     sc_module(name)
 {
+    top_stat = base_top_stat;
     //    pkt_sender_file.open("pkt_sender_file.log");
     pkt_sender_file.open(pkt_sender_filename);
     flow_sent_pkts.resize(g_flow_rule_tab.size());
@@ -253,6 +254,7 @@ void mod_stim::stim_prc()
                 pkt_desc_tmp.time_stamp.stm_out_clock = g_cycle_cnt;
                 port_token_bucket[send_port].sub_token(pkt_desc_tmp.len);
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
+                top_stat->output_comm_stat_func(pkt_desc_tmp);
                 cout << "@" << in_clk_cnt << "_clks stim sent =>:"
                      << "sport:" << send_port << pkt_desc_tmp << endl;
                 pkt_sender_file << "@" << in_clk_cnt << "_clks stim sent =>:"

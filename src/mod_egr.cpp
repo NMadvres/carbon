@@ -8,12 +8,12 @@
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-mod_egr::mod_egr(sc_module_name name):
+mod_egr::mod_egr(sc_module_name name, func_stat *base_top_stat):
     sc_module(name),
     clk_gap(G_FREQ_MHZ)
 {
     //for stat
-    top_stat = new mod_stat("egr_info", Module_top);
+    top_stat = base_top_stat;
 
     for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
@@ -87,7 +87,7 @@ void mod_egr::send_pkt_process()
     int top_delay = pkt.time_stamp.egr_out_clock - pkt.time_stamp.stm_out_clock;
     top_stat->record_comm_latency_func(top_delay);
 
-    //out_port[pkt.dport]->write(pkt);
+    out_port[pkt.dport]->write(pkt);
     fifo_port.pop_front();
     sub_token(pkt.len, pkt.dport);
 }
