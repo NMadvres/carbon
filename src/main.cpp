@@ -17,11 +17,13 @@ int sc_main(int argc, char *argv[])
     //全局计数器生成
     sc_clock clk("clk", 10, SC_NS); //10ns一个周期，100MHZ
                                     //   glb_cfg_c glb_cfg("temp_testcase.tab");
-
-    //   glb_cfg_c glb_cfg("../src/temp_testcase.tab");
-
-    //   string glb_cfg_file = string("./tb/tc/") + argv[1];
-    string glb_cfg_file = string("./tb/tc/") + argv[1] + string(".tab");
+    string test_tc;
+    if (argc > 1) {
+        test_tc = argv[1];
+    } else {
+        test_tc = "TC_LEN_001";
+    }
+    string glb_cfg_file = string("./tb/tc/") + test_tc + string(".tab");
     cout << glb_cfg_file << endl;
     glb_cfg_c glb_cfg(glb_cfg_file);
 
