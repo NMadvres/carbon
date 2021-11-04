@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////
 #include "mod_ing.h"
 
-#define mod_ing_print
+//#define mod_ing_print
 
 //#define mod_ing_stat_print
 
@@ -118,6 +118,11 @@ void mod_ing::lut_process()
             flow_rule = g_flow_rule_tab[flow_id];
             que_id = flow_rule.qid;
             dport_id = flow_rule.dport;
+        } else {
+            flow_id = -2;
+            que_id = -2;
+            dport_id = -2;
+            MOD_LOG("hash table err");
         }
     };
 }
