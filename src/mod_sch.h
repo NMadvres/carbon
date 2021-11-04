@@ -2,7 +2,7 @@
 #define __MOD_SCH_H__
 
 #include "comm_def.h"
-
+#include "../tb/src/mod_stat.h"
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_sch
@@ -30,6 +30,9 @@ public:
     int que_per_group;
     sc_in<int> in_fc_port;
     int fc_status;
+
+    //for stat
+    mod_stat *sch_stat;
 
 public:
     void main_process();

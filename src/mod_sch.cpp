@@ -29,6 +29,9 @@ mod_sch::mod_sch(sc_module_name name):
     //反压状态赋初值
     fc_status = 0;
 
+    //for stat
+    sch_stat = new mod_stat("detail_info", Module_sch);
+
     SC_METHOD(rev_pkt_process); //接包处理
     sensitive << in_clk_cnt;
     dont_initialize();
@@ -44,6 +47,10 @@ mod_sch::mod_sch(sc_module_name name):
 
 void mod_sch::main_process()
 {
+    int a = in_clk_cnt.read();
+    if ((a != 0) && (a % 10000 == 0)) {
+        sch_stat->print_info(10000);
+    }
     //rev_pkt_process();
     sch_pkt_process();
 }
@@ -64,7 +71,14 @@ void mod_sch::rev_pkt_process()
         bool flag = in_cell_que.nb_read(rd_pkt);
         ASSERT(flag == true);
 
+        //stat input
+        sch_stat->input_comm_stat_func(rd_pkt);
+
         int que_id = rd_pkt.qid;
+        //临时接近mcpu报文问题
+        if (que_id < 0) {
+            continue;
+        }
         //增加状态判断，确定是否处于丢弃状态，对于SOP切片判断，如需丢弃则flag拉起
         cout << "cur_cycle" << g_cycle_cnt << "   recv ing packet " << rd_pkt << "que size" << input_cell_que[que_id].size() << endl;
         if (rd_pkt.sop) {
@@ -93,6 +107,8 @@ void mod_sch::rev_pkt_process()
             }
         } else {
             cout << "cur_cycle" << g_cycle_cnt << "drop packet" << rd_pkt << endl;
+            //stat drop
+            sch_stat->drop_comm_stat_func(rd_pkt);
         }
 
         if (input_cell_que[que_id].size() > 1000) {
@@ -190,6 +206,10 @@ void mod_sch::send_cell_to_pe(int que_id)
         cur_cell.time_stamp.sch_out_clock = g_cycle_cnt;
         out_cell_que.nb_write(cur_cell);
         cout << "cur_cycle" << g_cycle_cnt << "   send packet to PE " << cur_cell << endl;
+        //stat out
+        sch_stat->output_comm_stat_func(cur_cell);
+        int delay_cycle = cur_cell.time_stamp.sch_out_clock - cur_cell.time_stamp.ing_out_clock;
+        sch_stat->record_comm_latency_func(delay_cycle);
         if (cur_cell.eop == true) {
             break;
         }

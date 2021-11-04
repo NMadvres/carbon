@@ -12,6 +12,9 @@ mod_egr::mod_egr(sc_module_name name):
     sc_module(name),
     clk_gap(G_FREQ_MHZ)
 {
+    //for stat
+    top_stat = new mod_stat("egr_info", Module_top);
+
     for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
         port_token_bucket[i] = port_token_bucket[i];
@@ -51,11 +54,20 @@ int mod_egr::get_token(const int port)
 
 void mod_egr::rev_pkt_process()
 {
-    fifo_port.push_back(in_port->read());
+    if (in_port.event()) {
+        s_pkt_desc tmp_pkt = in_port->read();
+        fifo_port.push_back(tmp_pkt);
+        top_stat->input_comm_stat_func(tmp_pkt);
+    }
 }
 
 void mod_egr::send_pkt_process()
 {
+    //for print
+    int a = in_clk_cnt.read();
+    if ((a != 0) && (a % 10000 == 0)) {
+        top_stat->print_info(10000);
+    }
     if (fifo_port.empty())
         return;
 
@@ -70,7 +82,12 @@ void mod_egr::send_pkt_process()
     pkt.time_stamp.egr_out_clock = g_cycle_cnt;
     port_send_bytes[pkt.dport] += pkt.len;
 
-    out_port[pkt.dport]->write(pkt);
+    //for stat output bw
+    top_stat->output_comm_stat_func(pkt);
+    int top_delay = pkt.time_stamp.egr_out_clock - pkt.time_stamp.stm_out_clock;
+    top_stat->record_comm_latency_func(top_delay);
+
+    //out_port[pkt.dport]->write(pkt);
     fifo_port.pop_front();
     sub_token(pkt.len, pkt.dport);
 }

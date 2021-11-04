@@ -36,7 +36,6 @@ int sc_main(int argc, char *argv[])
         egr_tb_sig[i] = new sc_signal<s_pkt_desc>();
         (*top_carbon_mod.in_ing_port[i])(*tb_ing_sig[i]);
         (*top_carbon_mod.out_egr_port[i])(*egr_tb_sig[i]);
-        (*top_tb_mod.in_pkt_stat[i])(*egr_tb_sig[i]);
         (*top_tb_mod.out_pkt_stim[i])(*tb_ing_sig[i]);
     }
     //绑定入口主时钟
@@ -47,7 +46,7 @@ int sc_main(int argc, char *argv[])
     top_tb_mod.in_clk_cnt(cycle_cnt_sig);  //一发多收
     top_carbon_mod.in_clk_cnt(cycle_cnt_sig);
 
-    sc_start(100000, SC_NS); //启动仿真
+    sc_start(1000, SC_US); //启动仿真
     top_tb_mod.stim_mod->~mod_stim();
     return 0;
 }

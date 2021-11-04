@@ -2,7 +2,7 @@
 #define __MOD_EGR_H__
 
 #include "comm_def.h"
-
+#include "../tb/src/mod_stat.h"
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_ing
@@ -30,6 +30,7 @@ public:
 
     std::deque<s_pkt_desc> fifo_port;
     int pkt_count_port;
+    mod_stat *top_stat;
 
 private:
     std::array<int, G_INTER_NUM> port_send_bytes;
