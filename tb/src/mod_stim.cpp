@@ -202,7 +202,7 @@ void mod_stim::stim_prc()
             flow_sent_mbps[fid] = (flow_sent_bytes[fid] * G_FREQ_MHZ) / in_clk_cnt;
             port_sent_mbps[send_pkt_port] = (port_sent_bytes[send_pkt_port] * G_FREQ_MHZ) / in_clk_cnt;
         }
-//
+        //
         // generate desc packet to bcpu
         if (1) {
             send_pkt_port = flow_rule_nomatch.sport;
