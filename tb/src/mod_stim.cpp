@@ -176,12 +176,12 @@ void mod_stim::stim_prc()
             pkt_desc_tmp.len = g_flow_rule_tab[fid].len;
             pkt_desc_tmp.pri = g_flow_rule_tab[fid].pri;
             pkt_desc_tmp.sport = g_flow_rule_tab[fid].sport;
-            pkt_desc_tmp.dport = -1;
-            pkt_desc_tmp.qid = -1;
+            pkt_desc_tmp.dport = g_flow_rule_tab[fid].dport;
+            pkt_desc_tmp.qid = g_flow_rule_tab[fid].qid;
             pkt_desc_tmp.vldl = -1;
             pkt_desc_tmp.csn = -1;
-            pkt_desc_tmp.sop = false;
-            pkt_desc_tmp.eop = false;
+            pkt_desc_tmp.sop = true;
+            pkt_desc_tmp.eop = true;
 
             if (flow_token_bucket[fid].read_token() >= pkt_desc_tmp.len) {
                 flow_token_bucket[fid].sub_token(pkt_desc_tmp.len);
@@ -220,8 +220,8 @@ void mod_stim::stim_prc()
             pkt_desc_tmp.qid = -1;
             pkt_desc_tmp.vldl = -1;
             pkt_desc_tmp.csn = -1;
-            pkt_desc_tmp.sop = false;
-            pkt_desc_tmp.eop = false;
+            pkt_desc_tmp.sop = true;
+            pkt_desc_tmp.eop = true;
 
             if (flow_nomatch_token_bucket.read_token() >= pkt_desc_tmp.len) {
                 flow_nomatch_token_bucket.sub_token(pkt_desc_tmp.len);
@@ -253,15 +253,15 @@ void mod_stim::stim_prc()
                 pkt_desc_tmp = port_fifo_inst[send_port].pkt_out();
                 pkt_desc_tmp.time_stamp.stm_out_clock = g_cycle_cnt;
                 port_token_bucket[send_port].sub_token(pkt_desc_tmp.len);
-                //临时添加，这地方以包为单位，sop/eop都打上
-                pkt_desc_tmp.sop = 1;
-                pkt_desc_tmp.eop = 1;
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
                 top_stat->output_comm_stat_func(pkt_desc_tmp);
                 cout << "@" << in_clk_cnt << "_clks stim sent =>:"
                      << "sport:" << send_port << pkt_desc_tmp << endl;
                 pkt_sender_file << "@" << in_clk_cnt << "_clks stim sent =>:"
                                 << "sport:" << send_port << pkt_desc_tmp << endl;
+                //娓呴浂
+                pkt_desc_tmp.dport = -1;
+                pkt_desc_tmp.qid = -1;
             }
         }
 
