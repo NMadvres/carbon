@@ -1,5 +1,6 @@
 #include "logger.h"
 #include <map>
+#include <iostream>
 
 namespace logger
 {
@@ -22,6 +23,10 @@ log_stream base_logger::operator()(level lv)
 
 void console_logger::output(level lv, std::string &&msg)
 {
+    auto str_lv = level_str.find(lv)->second;
+
+    std::cout << "[" << str_lv << "]"
+              << "\t" << msg << std::endl;
 }
 
 file_logger::file_logger(std::string filename)

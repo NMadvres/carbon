@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <assert.h>
 #include "systemc.h"
+#include "logger.h"
 using namespace std;
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
@@ -359,11 +360,26 @@ public:
 
 #define ASSERT(A) (assert(A))
 
-#define MOD_LOG(...)                                                    \
-    do {                                                                \
-        fprintf(stdout, "[cycle@%d][%s]: ", g_cycle_cnt, this->name()); \
-        fprintf(stdout, __VA_ARGS__);                                   \
-        fprintf(stdout, "\n");                                          \
-    } while (0)
+class mod_logger: public logger::console_logger
+{
+public:
+    using logger::console_logger::console_logger;
+
+    logger::log_stream operator()(sc_module *mod, logger::level lv)
+    {
+        logger::log_stream ls(*this, lv);
+        ls << "[cycle@" << g_cycle_cnt << "][" << mod->name() << "]: ";
+        return ls;
+    }
+};
+
+#define MOD_LOG__(lv) mod_lg_inst(this, lv)
+#define MOD_LOG_DEBUG MOD_LOG__(logger::level::DEBUG)
+#define MOD_LOG_INFO MOD_LOG__(logger::level::INFO)
+#define MOD_LOG_WARNING MOD_LOG__(logger::level::WARNING)
+#define MOD_LOG_ERROR MOD_LOG__(logger::level::ERROR)
+#define MOD_LOG_FATAL MOD_LOG__(logger::level::FATAL)
+#define MOD_LOG MOD_LOG_INFO
+extern mod_logger mod_lg_inst;
 
 #endif //__COMM_DEF_H__
