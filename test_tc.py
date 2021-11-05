@@ -1,9 +1,7 @@
 import os
-os.system('./carbon TC_LEN_001')
-os.system('./carbon TC_LEN_002')
-os.system('./carbon TC_LEN_003')
-os.system('./carbon TC_LEN_004')
-os.system('./carbon TC_LEN_005')
-os.system('./carbon TC_LEN_006')
-os.system('./carbon TC_LEN_007')
-os.system('./carbon TC_LEN_008')
+lst = os.listdir("./tb/tc")
+for c in lst:
+    if c.endswith('.tab'):
+        fileName = os.path.splitext(c)[0] + '\n'  # 分割，不带后缀名
+#        print(fileName)
+        os.system('./carbon %s' % fileName)
