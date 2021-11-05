@@ -30,6 +30,7 @@ public:
     std::deque<s_pkt_desc> fifo_port;
     int pkt_count_port;
     func_stat *top_stat;
+    int cycle_cnt;
 
 private:
     std::array<int, G_INTER_NUM> port_send_bytes;

@@ -14,6 +14,7 @@ mod_egr::mod_egr(sc_module_name name, func_stat *base_top_stat):
 {
     //for stat
     top_stat = base_top_stat;
+    cycle_cnt = 0;
 
     for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
@@ -49,10 +50,6 @@ void mod_egr::sub_token(const int &sub_token_val, const int port)
 
 int mod_egr::get_token(const int port)
 {
-    int port_speed_tmp = g_port_rule_tab[port];
-    if (port_speed_tmp < port_token_bucket[port]) {
-        port_token_bucket[port] = port_speed_tmp;
-    }
     return port_token_bucket[port];
 }
 
@@ -62,14 +59,21 @@ void mod_egr::rev_pkt_process()
         s_pkt_desc tmp_pkt = in_port->read();
         fifo_port.push_back(tmp_pkt);
         get_token(tmp_pkt.dport);
-        add_token(tmp_pkt.len, tmp_pkt.dport);
     }
 }
 
 void mod_egr::send_pkt_process()
 {
-    if (fifo_port.empty())
-        return;
+    //填桶，每周期填充1B，100M，就是100MBPS，现在100拍填1次，1次填N个Byte，就是N MBPS
+    if (cycle_cnt % 100 == 0) {
+        for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
+            int token_value = g_port_rule_tab[port_id];
+            add_token(token_value, port_id);
+        }
+    }
+    cycle_cnt++;
+
+    if (fifo_port.empty()) return;
 
     s_pkt_desc &pkt = fifo_port.front();
     if ((pkt.len > get_token(pkt.dport)))
@@ -80,7 +84,7 @@ void mod_egr::send_pkt_process()
     port_send_bytes[pkt.dport] += pkt.len;
 
     //for stat output bw
-    top_stat->output_comm_stat_func(pkt);
+    top_stat->input_comm_stat_func(pkt);
     int top_delay = pkt.time_stamp.egr_out_clock - pkt.time_stamp.stm_out_clock;
     top_stat->record_comm_latency_func(top_delay);
 
