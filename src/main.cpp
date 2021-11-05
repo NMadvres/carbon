@@ -24,10 +24,9 @@ int sc_main(int argc, char *argv[])
         cout << glb_cfg_file << endl;
         print_file = argv[1];
     }
-
     if (argc == 1) {
-        glb_cfg_file = string("temp_testcase") + string(".tab");
-        print_file = string("temp_testcase");
+        glb_cfg_file = string("./tb/tc/") + string("TC_LEN_001") + string(".tab");
+        print_file = string("TC_LEN_001");
     }
     print_file = print_file + string(".stat");
     cout << print_file << endl;

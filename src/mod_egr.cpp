@@ -63,7 +63,6 @@ void mod_egr::rev_pkt_process()
         fifo_port.push_back(tmp_pkt);
         get_token(tmp_pkt.dport);
         add_token(tmp_pkt.len, tmp_pkt.dport);
-        top_stat->input_comm_stat_func(tmp_pkt);
     }
 }
 

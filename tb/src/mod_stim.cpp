@@ -254,7 +254,7 @@ void mod_stim::stim_prc()
                 pkt_desc_tmp.time_stamp.stm_out_clock = g_cycle_cnt;
                 port_token_bucket[send_port].sub_token(pkt_desc_tmp.len);
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
-                top_stat->output_comm_stat_func(pkt_desc_tmp);
+                top_stat->input_comm_stat_func(pkt_desc_tmp);
                 cout << "@" << in_clk_cnt << "_clks stim sent =>:"
                      << "sport:" << send_port << pkt_desc_tmp << endl;
                 pkt_sender_file << "@" << in_clk_cnt << "_clks stim sent =>:"

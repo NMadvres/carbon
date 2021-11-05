@@ -504,8 +504,8 @@ void func_stat_base::print_info(int stat_period)
         fprintf(m_fp, "%-10d    %-10d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8d    %-8d  %c",
                 i, send_bytes, send_mbps, send_pkts, send_mpps, rcvd_bytes, rcvd_mbps, rcvd_pkts, rcvd_mpps, dpd_pkts, dpd_mpps, avg_dly, min_dly, max_dly, 13);
         //清零
-        input_que_pktlen_stat[i] = 0;
-        output_que_pktlen_stat[i] = 0;
+        //input_que_pktlen_stat[i] = 0;
+        //output_que_pktlen_stat[i] = 0;
     }
     fprintf(m_fp, "%c", 13);
 
