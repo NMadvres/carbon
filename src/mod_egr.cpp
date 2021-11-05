@@ -49,11 +49,10 @@ void mod_egr::sub_token(const int &sub_token_val, const int port)
 
 int mod_egr::get_token(const int port)
 {
-
     int port_speed_tmp = g_port_rule_tab[port];
-		if (port_speed_tmp < port_token_bucket[port]) {
-				port_token_bucket[port] = port_speed_tmp;
-		}
+    if (port_speed_tmp < port_token_bucket[port]) {
+        port_token_bucket[port] = port_speed_tmp;
+    }
     return port_token_bucket[port];
 }
 
@@ -62,8 +61,8 @@ void mod_egr::rev_pkt_process()
     if (in_port.event()) {
         s_pkt_desc tmp_pkt = in_port->read();
         fifo_port.push_back(tmp_pkt);
-				get_token(tmp_pkt.dport);
-				add_token(tmp_pkt.len, tmp_pkt.dport);
+        get_token(tmp_pkt.dport);
+        add_token(tmp_pkt.len, tmp_pkt.dport);
         top_stat->input_comm_stat_func(tmp_pkt);
     }
 }
