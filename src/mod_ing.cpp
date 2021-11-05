@@ -66,10 +66,13 @@ void mod_ing::rev_pkt_process()
                 infifo_count_port[i]++;
             }
 #ifdef mod_ing_print
-            MOD_LOG("ing_in_pkt %s", in_port[i]->read().to_string());
+            MOD_LOG << "ing_in_pkt" << in_port[i]->read();
 #endif
 #ifdef mod_ing_stat_print
-            MOD_LOG("port id:%d,pkts received:%d,pkts infifo:%d, pkts dropped:%d", i, pkt_count_port[i], infifo_count_port[i], drop_count_port[i]);
+            MOD_LOG << "port id:" << i
+                    << ", pkts received: " << pkt_count_port[i]
+                    << ", pkts infifo: " << infifo_count_port[i]
+                    << ", pkts dropped: " << drop_count_port[i];
 #endif
         };
     }
@@ -125,7 +128,7 @@ void mod_ing::lut_process()
             flow_id = -2;
             que_id = -2;
             dport_id = 254;
-            MOD_LOG("hash table err");
+            MOD_LOG << "hash table err";
             bcpu_flag = 1;
         }
     };
@@ -157,7 +160,7 @@ void mod_ing::pkt_to_cell_process()
         cell_sn++;
 
 #ifdef mod_ing_print
-        MOD_LOG("ing_out_cell %s", cell_trans.to_string());
+        MOD_LOG << "ing_out_cell" << cell_trans;
 #endif
 
 #ifdef mod_ing_stat_print
@@ -193,17 +196,19 @@ void mod_ing::pkt_to_cell_process()
             cell_trans.sop = false;
         }
         cell_trans.eop = true;
+        //增加时戳信息
+        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt;
         if (bcpu_flag == 0) {
             cell_trans.type = 1;
             out_cell_que.nb_write(cell_trans);
 #ifdef mod_ing_print
-            MOD_LOG("ing_out_cell %s", cell_trans.to_string());
+            MOD_LOG << "ing_out_cell" << cell_trans;
 #endif
         } else {
             cell_trans.type = 0;
             out_pkt_bcpu.nb_write(cell_trans);
 #ifdef mod_ing_print
-            MOD_LOG("ing_out_bcpu_pkt %s", cell_trans.to_string());
+            MOD_LOG << "ing_out_bcpu_pkt" << cell_trans;
 #endif
         }
 

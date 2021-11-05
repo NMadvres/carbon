@@ -14,6 +14,7 @@ LDLIBS   += $(shell pkg-config --libs-only-l     systemc)
 CXXFLAGS += -I./src -I./tb/src
 
 SOURCES = src/comm_def.cpp \
+		  src/logger.cpp \
 		  src/main.cpp \
 		  src/mod_egr.cpp \
 		  src/mod_ing.cpp \
