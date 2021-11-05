@@ -45,8 +45,8 @@ public:
             (stim_mod->out_pkt_stim[i])(*out_pkt_stim[i]);
             stat_mod->in_pkt_stat[i]->bind(*in_pkt_stat[i]);
         }
-        testctrl_mod->in_glb_clk(in_glb_clk); //透传clk连线
-        testctrl_mod->out_clk_cnt(out_clk_cnt);
+        testctrl_mod->in_glb_clk(in_glb_clk);   //透传clk连线
+        testctrl_mod->out_clk_cnt(out_clk_cnt); //从 testctrl 模块传出时钟计数
         //cycle计数信号透传
         stim_mod->in_clk_cnt(in_clk_cnt);
         stat_mod->in_clk_cnt(in_clk_cnt);
