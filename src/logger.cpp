@@ -40,7 +40,8 @@ void file_logger::output(level lv, std::string &&msg)
 {
     auto str_lv = level_str.find(lv)->second;
 
-    _file << "[" << str_lv << "]" << "\t" << msg << std::endl;
+    _file << "[" << str_lv << "]"
+          << "\t" << msg << std::endl;
 }
 
 }; // namespace logger

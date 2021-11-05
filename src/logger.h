@@ -33,7 +33,6 @@ public:
     log_stream operator()(level lv);
 };
 
-
 class log_stream: public std::ostringstream
 {
 public:
@@ -52,7 +51,6 @@ private:
     level _lv;
 };
 
-
 class console_logger: public base_logger
 {
 public:
@@ -60,7 +58,6 @@ public:
 
     void output(level lv, std::string &&msg);
 };
-
 
 class file_logger: public base_logger
 {
