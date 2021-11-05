@@ -34,6 +34,7 @@ mod_ing::mod_ing(sc_module_name name):
         flow_pkt_cnt[i] = 0;
         flow_pkt_cell_cnt[i] = 0;
     }
+    bcpu_pkt_cnt = 0;
 
     SC_METHOD(rev_pkt_process);
     for (int i = 0; i < G_INTER_NUM; i++) {
@@ -118,11 +119,14 @@ void mod_ing::lut_process()
             flow_rule = g_flow_rule_tab[flow_id];
             que_id = flow_rule.qid;
             dport_id = flow_rule.dport;
+            bcpu_flag = 0;
+
         } else {
             flow_id = -2;
             que_id = -2;
-            dport_id = -2;
+            dport_id = 254;
             MOD_LOG("hash table err");
+            bcpu_flag = 1;
         }
     };
 }
@@ -133,7 +137,7 @@ void mod_ing::pkt_to_cell_process()
     s_pkt_desc cell_trans;
     cell_sn = 0;
 
-    while (pkt_tmp_len > G_CELL_LEN) {
+    while ((pkt_tmp_len > G_CELL_LEN) && (bcpu_flag == 0)) {
         cell_trans = s_port_sch_result;
         cell_trans.type = 1;
         cell_trans.qid = que_id;
@@ -147,8 +151,6 @@ void mod_ing::pkt_to_cell_process()
         } else {
             cell_trans.sop = false;
         }
-        //增加时戳信息
-        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt;
         out_cell_que.nb_write(cell_trans);
         pkt_tmp_len -= G_CELL_LEN;
         pkt_head_flag = 0;
@@ -179,7 +181,6 @@ void mod_ing::pkt_to_cell_process()
 
     if (pkt_tmp_len > 0) {
         cell_trans = s_port_sch_result;
-        cell_trans.type = 1;
         cell_trans.qid = que_id;
         cell_trans.dport = dport_id;
         cell_trans.fid = flow_id;
@@ -192,9 +193,14 @@ void mod_ing::pkt_to_cell_process()
             cell_trans.sop = false;
         }
         cell_trans.eop = true;
-        //增加时戳信息
-        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt;
-        out_cell_que.nb_write(cell_trans);
+        if (bcpu_flag == 0) {
+            cell_trans.type = 1;
+            out_cell_que.nb_write(cell_trans);
+        } else {
+            cell_trans.type = 0;
+            out_pkt_bcpu.nb_write(cell_trans);
+        }
+
         pkt_tmp_len = 0;
         pkt_out_flag = 0;
 
@@ -224,6 +230,11 @@ void mod_ing::pkt_to_cell_process()
             }
             MOD_LOG("flow%d_pkt_cnt:%d,flow%d_pkt_cell_cnt:%d", i, flow_pkt_cnt[i], i, flow_pkt_cell_cnt[i]);
         }
+        if (cell_trans.dport == 254) {
+            bcpu_pkt_cnt++;
+            MOD_LOG("bcpu_pkt_cnt:%d", bcpu_pkt_cnt);
+        }
+
 #endif
     }
 }
