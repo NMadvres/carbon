@@ -33,14 +33,14 @@ void mod_pe::on_recv_cell()
         in_cell_que.nb_read(cell);
 
         if (cell.type != DESC_TYPE_CELL) {
-            MOD_LOG_ERROR << "cell type error" << cell;
+            MOD_LOG("cell type error %s", cell.to_string());
             return;
         }
 
         // no pending packet
         if (pkt_que.empty() || pkt_que.back().type == DESC_TYPE_PKT) {
             if (!cell.sop) {
-                MOD_LOG_ERROR << "cell sop error" << cell;
+                MOD_LOG("cell sop error %s", cell.to_string());
                 return;
             }
 
@@ -69,7 +69,7 @@ void mod_pe::on_send_pkt()
     if (pkt_que.size() >= 2 && !is_busy) {
         out_pe_busy.write(1);
         is_busy = true;
-        MOD_LOG << "send busy";
+        MOD_LOG("send busy");
     }
 
     if (clk_wait) {
@@ -83,7 +83,7 @@ void mod_pe::on_send_pkt()
     s_pkt_desc &pkt = pkt_que.front();
 
     if (g_flow_rule_tab.size() < (unsigned int)pkt.fid) {
-        MOD_LOG_ERROR << "pkt fid error" << pkt;
+        MOD_LOG("pkt fid error %s", pkt.to_string());
         pkt_que.pop_front();
         return;
     }
@@ -95,7 +95,7 @@ void mod_pe::on_send_pkt()
     pkt.time_stamp.pe_out_clock = g_cycle_cnt;
     out_cell_que.write(pkt);
     pkt_que.pop_front();
-    MOD_LOG << "pkt go next" << pkt;
+    MOD_LOG("pkt go next %s", pkt.to_string());
 
     clk_wait = clk_gap - 1;
 
@@ -103,7 +103,7 @@ void mod_pe::on_send_pkt()
         if (pkt_que.size() < 2) {
             out_pe_busy.write(0);
             is_busy = false;
-            MOD_LOG << "send no busy";
+            MOD_LOG("send no busy");
         }
     }
 }

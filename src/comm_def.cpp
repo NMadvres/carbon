@@ -18,7 +18,6 @@ std::vector<s_flow_rule> g_flow_rule_tab;
 std::unordered_map<s_hash_rule_key, int, has_rule_key_hash> g_hash_rule_tab;
 std::vector<s_tab_que> g_que_rule_tab;
 std::vector<s_tab_port> g_port_rule_tab;
-mod_logger mod_lg_inst;
 
 const char *s_pkt_desc::to_string() const
 {
