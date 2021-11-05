@@ -446,6 +446,12 @@ void func_stat_base::drop_record_bw_info(int que_id, int valid_len, int is_eop)
 
 void func_stat_base::record_latency_info(int delay_cnt)
 {
+    if (record_delay_cnt == 0) {
+        record_min_delay = delay_cnt;
+        record_max_delay = delay_cnt;
+        record_avg_delay = delay_cnt;
+    }
+
     if (delay_cnt < record_min_delay) {
         record_min_delay = delay_cnt;
     }
