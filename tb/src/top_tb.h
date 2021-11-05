@@ -31,7 +31,7 @@ public:
     top_tb(sc_module_name name, func_stat *base_top_stat):
         sc_module(name)
     {
-        //例化
+        //例化 instantiation for module pointers.
         stim_mod = new mod_stim("stim_mod", base_top_stat);
         stat_mod = new mod_stat("stat_mod");
         testctrl_mod = new mod_testctrl("mod_testctrl");
@@ -39,16 +39,19 @@ public:
             in_pkt_stat[i] = new sc_in<s_pkt_desc>();
             out_pkt_stim[i] = new sc_out<s_pkt_desc>();
         }
-        //互联
-        //ing的入口和egr的出口，连线透传到顶层，待更高层进行连接
-        for (int i = 0; i < G_INTER_NUM; i++) {
-            (stim_mod->out_pkt_stim[i])(*out_pkt_stim[i]);
-            stat_mod->in_pkt_stat[i]->bind(*in_pkt_stat[i]);
-        }
+
+        //PORTING for all modules inside top_tb.
+        //[stim module porting]
+        //out_pkt_stim is to be link to ing via top_tb 
+        for (int i = 0; i < G_INTER_NUM; i++) (stim_mod->out_pkt_stim[i])(*out_pkt_stim[i]);
+        stim_mod->in_clk_cnt(in_clk_cnt);
+        
+        //[testctrl module porting], just to count the clock and feed the globle counter.
         testctrl_mod->in_glb_clk(in_glb_clk);   //透传clk连线
         testctrl_mod->out_clk_cnt(out_clk_cnt); //从 testctrl 模块传出时钟计数
-        //cycle计数信号透传
-        stim_mod->in_clk_cnt(in_clk_cnt);
+
+        //[stat moudule porting]
+        for (int i = 0; i < G_INTER_NUM; i++) stat_mod->in_pkt_stat[i]->bind(*in_pkt_stat[i]);
         stat_mod->in_clk_cnt(in_clk_cnt);
     }
 
