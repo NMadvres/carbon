@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////
 #include "mod_ing.h"
 
-//#define mod_ing_print
+#define mod_ing_print
 
 //#define mod_ing_stat_print
 
@@ -151,8 +151,6 @@ void mod_ing::pkt_to_cell_process()
         } else {
             cell_trans.sop = false;
         }
-        //增加时戳信息
-        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt;
         out_cell_que.nb_write(cell_trans);
         pkt_tmp_len -= G_CELL_LEN;
         pkt_head_flag = 0;
@@ -195,22 +193,22 @@ void mod_ing::pkt_to_cell_process()
             cell_trans.sop = false;
         }
         cell_trans.eop = true;
-		//增加时戳信息
-        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt;
         if (bcpu_flag == 0) {
             cell_trans.type = 1;
             out_cell_que.nb_write(cell_trans);
+#ifdef mod_ing_print
+            MOD_LOG("ing_out_cell %s", cell_trans.to_string());
+#endif
         } else {
             cell_trans.type = 0;
             out_pkt_bcpu.nb_write(cell_trans);
+#ifdef mod_ing_print
+            MOD_LOG("ing_out_bcpu_pkt %s", cell_trans.to_string());
+#endif
         }
 
         pkt_tmp_len = 0;
         pkt_out_flag = 0;
-
-#ifdef mod_ing_print
-        MOD_LOG("ing_out_cell %s", cell_trans.to_string());
-#endif
 
 #ifdef mod_ing_stat_print
         for (int i = 0; i < G_INTER_NUM; i++) {
