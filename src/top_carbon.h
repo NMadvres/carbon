@@ -27,6 +27,7 @@ public:
     std::array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_egr_port; // 用于透传连线egr的输出端口信号,在顶层连接stat
     sc_fifo<s_pkt_desc> *ing_sch_sig;                           // 用于连接ing和sch
     sc_fifo<s_pkt_desc> *sch_pe_sig;                            // 用于连接ing和sch
+    sc_fifo<s_pkt_desc> *ing_egr_bcpu_sig;                      // 用于连接ing和egr
     sc_signal<s_pkt_desc> pe_egr_sig;                           // 用于连接ing和sch
     sc_signal<int> pe_sch_fc_sig;                               // 用于连接pe和sch,反压信号
     sc_in<int> in_clk_cnt;                                      // 全局时钟计数，用于互联
@@ -50,6 +51,9 @@ public: // 例化及互联部分
         ing_sch_sig = new sc_fifo<s_pkt_desc>(256);
         ing_mod->out_cell_que(*ing_sch_sig);
         sch_mod->in_cell_que(*ing_sch_sig); // 绑定ing和sch
+
+        ing_egr_bcpu_sig = new sc_fifo<s_pkt_desc>(256);
+        ing_mod->out_pkt_bcpu(*ing_egr_bcpu_sig); // 绑定ing和pe
 
         sch_pe_sig = new sc_fifo<s_pkt_desc>(256);
         sch_mod->out_cell_que(*sch_pe_sig);

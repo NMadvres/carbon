@@ -22,7 +22,7 @@ public:
     std::array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_port;
     // output
     sc_fifo_out<s_pkt_desc> out_cell_que;
-    //    sc_out<s_pkt_desc> out_cell_que;
+    sc_fifo_out<s_pkt_desc> out_pkt_bcpu;
 
 public:
     mod_ing(sc_module_name mod_ing);
@@ -41,6 +41,7 @@ private:
     int pkt_tmp_len = 0;
     int pkt_out_flag = 0;
     int pkt_head_flag = 0;
+    int bcpu_flag = 0;
     s_flow_rule flow_rule;
 
     std::array<std::deque<s_pkt_desc>, G_INTER_NUM> fifo_port;
@@ -53,6 +54,7 @@ private:
     std::array<int, G_QUE_NUM> que_pkt_cell_cnt;
     std::array<int, 16> flow_pkt_cnt;
     std::array<int, 16> flow_pkt_cell_cnt;
+    int bcpu_pkt_cnt;
 
     RR_SCH *rr_sch;
 };
