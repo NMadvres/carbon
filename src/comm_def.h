@@ -305,7 +305,7 @@ public:
 public:
     int m_que_num;
     //delay relate
-    int record_cycle;
+    int record_total_delay;
     int record_max_delay;
     int record_min_delay;
     int record_avg_delay;
