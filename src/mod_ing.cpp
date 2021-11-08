@@ -154,6 +154,7 @@ void mod_ing::pkt_to_cell_process()
         } else {
             cell_trans.sop = false;
         }
+        cell_trans.eop = false;
         out_cell_que.nb_write(cell_trans);
         pkt_tmp_len -= G_CELL_LEN;
         pkt_head_flag = 0;
@@ -196,8 +197,7 @@ void mod_ing::pkt_to_cell_process()
             cell_trans.sop = false;
         }
         cell_trans.eop = true;
-        //增加时戳信息
-        cell_trans.time_stamp.ing_out_clock = g_cycle_cnt;
+
         if (bcpu_flag == 0) {
             cell_trans.type = 1;
             out_cell_que.nb_write(cell_trans);
