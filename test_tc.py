@@ -1,3 +1,4 @@
+import sys
 import os
 lst = os.listdir("./tb/tc")
 for c in lst:
@@ -5,3 +6,13 @@ for c in lst:
         fileName = os.path.splitext(c)[0] + '\n'  # 分割，不带后缀名
 #        print(fileName)
         os.system('./carbon %s' % fileName)
+
+for i in range(1, len(sys.argv)):
+    copy_dir = sys.argv[1]
+
+if sys.argv[1]:
+    if os.path.exists('%s' % copy_dir) == False:
+        os.system('mkdir /mnt/%s' % copy_dir)
+
+    os.system('scp -r run_log/ /mnt/%s' % copy_dir)
+    print('scp -r run_log/ /mnt/%s' % copy_dir)
