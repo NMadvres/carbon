@@ -22,12 +22,18 @@ public:
     void rev_pkt_process(void);
     void send_pkt_process(void);
 
+    void rev_pkt_from_ing_process(void);
+    void send_pkt_to_cpu_process(void);
+
 public:
     sc_in<s_pkt_desc> in_port;
     std::array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_port;
     sc_in<int> in_clk_cnt;
 
+    sc_fifo_in<s_pkt_desc> in_pkt_bcpu;
+
     std::deque<s_pkt_desc> fifo_port;
+    std::deque<s_pkt_desc> fifo_bcpu;
     int pkt_count_port;
     func_stat *top_stat;
     int cycle_cnt;

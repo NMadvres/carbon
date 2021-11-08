@@ -30,6 +30,28 @@ mod_egr::mod_egr(sc_module_name name, func_stat *base_top_stat):
     SC_METHOD(send_pkt_process);
     sensitive << in_clk_cnt;
     dont_initialize();
+
+    SC_METHOD(send_pkt_to_cpu_process);
+    sensitive << in_clk_cnt;
+    dont_initialize();
+
+    SC_METHOD(rev_pkt_from_ing_process);
+    sensitive << in_pkt_bcpu;
+    dont_initialize();
+}
+
+void mod_egr::rev_pkt_from_ing_process()
+{
+    if (in_pkt_bcpu.num_available()) {
+        s_pkt_desc pkt;
+        in_pkt_bcpu.nb_read(pkt);
+        if (pkt.type != DESC_TYPE_PKT) {
+            MOD_LOG_ERROR << "Packet type error" << pkt;
+            return;
+        }
+
+        fifo_bcpu.push_back(pkt);
+    }
 }
 
 void mod_egr::add_token(const int &add_token_val, const int port)
@@ -73,9 +95,11 @@ void mod_egr::send_pkt_process()
     }
     cycle_cnt++;
 
-    if (fifo_port.empty()) return;
+    if (fifo_port.empty())
+        return;
 
     s_pkt_desc &pkt = fifo_port.front();
+
     if ((pkt.len > get_token(pkt.dport)))
         return;
 
@@ -91,4 +115,15 @@ void mod_egr::send_pkt_process()
     out_port[pkt.dport]->write(pkt);
     fifo_port.pop_front();
     sub_token(pkt.len, pkt.dport);
+}
+
+void mod_egr::send_pkt_to_cpu_process()
+{
+    if (fifo_bcpu.empty())
+        return;
+
+    s_pkt_desc &pkt = fifo_bcpu.front();
+    if (pkt.qid == -2) {
+        //TODO
+    }
 }
