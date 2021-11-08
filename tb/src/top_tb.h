@@ -42,10 +42,10 @@ public:
 
         //PORTING for all modules inside top_tb.
         //[stim module porting]
-        //out_pkt_stim is to be link to ing via top_tb 
+        //out_pkt_stim is to be link to ing via top_tb
         for (int i = 0; i < G_INTER_NUM; i++) (stim_mod->out_pkt_stim[i])(*out_pkt_stim[i]);
         stim_mod->in_clk_cnt(in_clk_cnt);
-        
+
         //[testctrl module porting], just to count the clock and feed the globle counter.
         testctrl_mod->in_glb_clk(in_glb_clk);   //透传clk连线
         testctrl_mod->out_clk_cnt(out_clk_cnt); //从 testctrl 模块传出时钟计数
