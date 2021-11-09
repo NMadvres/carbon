@@ -19,13 +19,15 @@ int sc_main(int argc, char *argv[])
     //   glb_cfg_c glb_cfg("temp_testcase.tab");
     string glb_cfg_file;
     string print_file;
-    if (argc == 2) {
-        glb_cfg_file = string("./tb/tc/") + argv[1] + string(".tab");
+    if (argc >1 ) {
+        glb_cfg_file = string(argv[2]) +string(argv[1]) + string(".tab");
         cout << glb_cfg_file << endl;
         print_file = argv[1];
     }
     if (argc == 1) {
-        glb_cfg_file = string("./tb/tc/") + string("TC_LEN_001") + string(".tab");
+//        glb_cfg_file = string("./tb/tc/") + string("TC_LEN_001") + string(".tab");
+        glb_cfg_file = string("/mnt/d") + string("TC_LEN_001") + string(".tab");
+
         print_file = string("TC_LEN_001");
     }
     print_file = print_file + string(".stat");
@@ -58,7 +60,7 @@ int sc_main(int argc, char *argv[])
     top_tb_mod.in_clk_cnt(cycle_cnt_sig);  //一发多收
     top_carbon_mod.in_clk_cnt(cycle_cnt_sig);
 
-    sc_start(1000, SC_US); //启动仿真
+    sc_start(10, SC_US); //启动仿真
     top_tb_mod.stim_mod->~mod_stim();
     int simu_cycle = 1000 * 1000 / 10;
     top_stat->print_info(simu_cycle);
