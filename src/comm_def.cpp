@@ -375,7 +375,7 @@ func_stat_base::func_stat_base(string file_name, MODULE_TYPE mod_name, Stat_BASE
     output_que_pktlen_stat.resize(m_que_num, 0);
     output_que_pktnum_stat.resize(m_que_num, 0);
     drop_que_pktnum_stat.resize(m_que_num, 0);
-    record_cycle = 0;
+    record_total_delay = 0;
     //延时相关
     record_max_delay = 0;
     record_min_delay = 0;
@@ -459,8 +459,9 @@ void func_stat_base::record_latency_info(int delay_cnt)
     if (delay_cnt > record_max_delay) {
         record_max_delay = delay_cnt;
     }
-    record_avg_delay = (record_avg_delay * record_delay_cnt + delay_cnt) / (record_delay_cnt + 1);
+    record_total_delay += delay_cnt;
     record_delay_cnt++;
+    record_avg_delay = record_total_delay / record_delay_cnt;
 }
 
 void func_stat_base::print_info(int stat_period)
