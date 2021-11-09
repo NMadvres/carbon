@@ -255,8 +255,8 @@ void mod_stim::stim_prc()
                 port_token_bucket[send_port].sub_token(pkt_desc_tmp.len);
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
                 top_stat->output_comm_stat_func(pkt_desc_tmp);
-                cout << "@" << in_clk_cnt << "_clks stim sent =>:"
-                     << "sport:" << send_port << pkt_desc_tmp << endl;
+                MOD_LOG << "@" << in_clk_cnt << "_clks stim sent =>:"
+                        << "sport:" << send_port << pkt_desc_tmp << endl;
                 pkt_sender_file << "@" << in_clk_cnt << "_clks stim sent =>:"
                                 << "sport:" << send_port << pkt_desc_tmp << endl;
                 //清零
