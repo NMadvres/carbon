@@ -50,10 +50,10 @@ int sc_main(int argc, char *argv[])
             break;
         case 'h':
             print_usage(argv[0]);
-	    return 0;
+            return 0;
         default:
             fprintf(stderr, "Unknown option: %c\n", opt);
-	    return -1;
+            return -1;
         }
     }
 
