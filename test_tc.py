@@ -5,7 +5,7 @@ for c in lst:
     if c.endswith('.tab'):
         fileName = os.path.splitext(c)[0] + '\n'  # 分割，不带后缀名
 #        print(fileName)
-        os.system('./carbon %s' % fileName)
+        os.system('./carbon -c %s' % fileName)
 
 for i in range(1, len(sys.argv)):
     copy_dir = sys.argv[1]

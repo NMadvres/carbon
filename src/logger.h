@@ -23,14 +23,34 @@ class log_stream;
 
 class base_logger
 {
+private:
+    bool m_enable;
+
 public:
-    base_logger() = default;
+    base_logger():
+        m_enable(true)
+    {}
 
     virtual ~base_logger() = default;
 
     virtual void output(level lv, std::string &&msg) = 0;
 
     log_stream operator()(level lv);
+
+    void enable()
+    {
+        m_enable = true;
+    }
+
+    void disable()
+    {
+        m_enable = false;
+    }
+
+    bool is_enabled()
+    {
+        return m_enable;
+    }
 };
 
 class log_stream: public std::ostringstream

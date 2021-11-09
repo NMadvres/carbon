@@ -23,10 +23,12 @@ log_stream base_logger::operator()(level lv)
 
 void console_logger::output(level lv, std::string &&msg)
 {
-    auto str_lv = level_str.find(lv)->second;
+    if (is_enabled()) {
+        auto str_lv = level_str.find(lv)->second;
 
-    std::cout << "[" << str_lv << "]"
-              << "\t" << msg << std::endl;
+        std::cout << "[" << str_lv << "]"
+                  << "\t" << msg << std::endl;
+    }
 }
 
 file_logger::file_logger(std::string filename)
@@ -43,10 +45,12 @@ file_logger::~file_logger()
 
 void file_logger::output(level lv, std::string &&msg)
 {
-    auto str_lv = level_str.find(lv)->second;
+    if (is_enabled()) {
+        auto str_lv = level_str.find(lv)->second;
 
-    _file << "[" << str_lv << "]"
-          << "\t" << msg << std::endl;
+        _file << "[" << str_lv << "]"
+              << "\t" << msg << std::endl;
+    }
 }
 
 }; // namespace logger
