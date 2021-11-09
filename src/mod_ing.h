@@ -57,8 +57,6 @@ private:
     int bcpu_pkt_cnt;
 
     RR_SCH *rr_sch;
-     //test PR3   
-    //test PR2
-    //test PR1
+
 };
 #endif // __MOD_ING_H__
