@@ -32,7 +32,6 @@ int sc_main(int argc, char *argv[])
     //全局计数器生成
     sc_clock clk("clk", 10, SC_NS); //10ns一个周期，100MHZ
 
-
     std::string glb_cfg_file;
     std::string print_file;
     std::string case_name(DEFAULT_CASE_NAME);
@@ -56,17 +55,10 @@ int sc_main(int argc, char *argv[])
             fprintf(stderr, "Unknown option: %c\n", opt);
             return -1;
         }
-    if (argc >1 ) {
-        glb_cfg_file = string(argv[2]) +string(argv[1]) + string(".tab");
-        cout << glb_cfg_file << endl;
-        print_file = argv[1];
     }
-    if (argc == 1) {
-//        glb_cfg_file = string("./tb/tc/") + string("TC_LEN_001") + string(".tab");
-        glb_cfg_file = string("/mnt/d") + string("TC_LEN_001") + string(".tab");
-
-        print_file = string("TC_LEN_001");
-
+    glb_cfg_file = std::string("./tb/tc/") + case_name + std::string(".tab");
+    print_file = case_name + string(".stat");
+    std::cout << "case name: " << case_name << std::endl;
     glb_cfg_c glb_cfg(glb_cfg_file);
 
     //例化统计类
@@ -94,7 +86,7 @@ int sc_main(int argc, char *argv[])
     top_tb_mod.in_clk_cnt(cycle_cnt_sig);  //一发多收
     top_carbon_mod.in_clk_cnt(cycle_cnt_sig);
 
-    sc_start(10, SC_US); //启动仿真
+    sc_start(1000, SC_US); //启动仿真
     top_tb_mod.stim_mod->~mod_stim();
     int simu_cycle = 1000 * 1000 / 10;
     top_stat->print_info(simu_cycle);

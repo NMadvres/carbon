@@ -57,6 +57,5 @@ private:
     int bcpu_pkt_cnt;
 
     RR_SCH *rr_sch;
-
 };
 #endif // __MOD_ING_H__
