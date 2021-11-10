@@ -7,10 +7,9 @@ for c in lst:
 #        print(fileName)
         os.system('./carbon -c %s' % fileName)
 
-for i in range(1, len(sys.argv)):
+if len(sys.argv) > 1:
     copy_dir = sys.argv[1]
 
-if sys.argv[1]:
     if os.path.exists('%s' % copy_dir) == False:
         os.system('mkdir /mnt/%s' % copy_dir)
 
