@@ -205,7 +205,7 @@ void mod_stim::stim_prc()
         }
         //
         // generate desc packet to bcpu
-        if (1) {
+        if (0) {
             send_pkt_port = flow_rule_nomatch.sport;
 
             pkt_desc_tmp.type = 0;
