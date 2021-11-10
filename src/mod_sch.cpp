@@ -80,7 +80,7 @@ void mod_sch::rev_pkt_process()
             continue;
         }
         //增加状态判断，确定是否处于丢弃状态，对于SOP切片判断，如需丢弃则flag拉起
-        MOD_LOG << "cur_cycle" << g_cycle_cnt << "   recv ing packet " << rd_pkt << "que size" << input_cell_que[que_id].size() << endl;
+        MOD_LOG << "cur_cycle" << g_cycle_cnt << "   recv ing packet " << rd_pkt << "que size" << input_cell_que[que_id].size();
         if (rd_pkt.sop) {
             if (input_drop_flag[que_id] == 0) {
                 if (input_cell_que[que_id].size() > 100) {
@@ -106,13 +106,13 @@ void mod_sch::rev_pkt_process()
                 que_status[que_id / G_PRI_NUM][que_id % G_PRI_NUM] = 1;
             }
         } else {
-            MOD_LOG << "cur_cycle" << g_cycle_cnt << "  drop packet" << rd_pkt << endl;
+            MOD_LOG << "cur_cycle" << g_cycle_cnt << "  drop packet" << rd_pkt;
             //stat drop
             sch_stat->drop_comm_stat_func(rd_pkt);
         }
 
         if (input_cell_que[que_id].size() > 1000) {
-            MOD_LOG << "input_cell_que overflow size:" << input_cell_que[que_id].size() << endl;
+            MOD_LOG << "input_cell_que overflow size:" << input_cell_que[que_id].size();
             ASSERT(0);
         }
     }
@@ -205,7 +205,7 @@ void mod_sch::send_cell_to_pe(int que_id)
         //增加时戳信息
         cur_cell.time_stamp.sch_out_clock = g_cycle_cnt;
         out_cell_que.nb_write(cur_cell);
-        MOD_LOG << "cur_cycle" << g_cycle_cnt << "   send packet to PE " << cur_cell << endl;
+        MOD_LOG << "cur_cycle" << g_cycle_cnt << "   send packet to PE " << cur_cell;
         //stat out
         sch_stat->output_comm_stat_func(cur_cell);
         int delay_cycle = cur_cell.time_stamp.sch_out_clock - cur_cell.time_stamp.ing_out_clock;

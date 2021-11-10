@@ -256,7 +256,7 @@ void mod_stim::stim_prc()
                 out_pkt_stim[send_port].write(pkt_desc_tmp);
                 top_stat->output_comm_stat_func(pkt_desc_tmp);
                 MOD_LOG << "@" << in_clk_cnt << "_clks stim sent =>:"
-                        << "sport:" << send_port << pkt_desc_tmp << endl;
+                        << "sport:" << send_port << pkt_desc_tmp;
                 pkt_sender_file << "@" << in_clk_cnt << "_clks stim sent =>:"
                                 << "sport:" << send_port << pkt_desc_tmp << endl;
                 //清零

@@ -2,6 +2,20 @@
 #include "systemc.h"
 #include "top_carbon.h"
 #include "../tb/src/top_tb.h"
+#include <unistd.h>
+
+#define DEFAULT_CASE_NAME "TC_LEN_001"
+
+static void print_usage(const char *app_name)
+{
+    printf("Usage:\n"
+           "  %s [options]\n"
+           "Options:\n"
+           "  -c <case name>   Run the case\n"
+           "  -d               Print module debug log\n"
+           "  -h               Print this help info\n",
+           app_name);
+}
 
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
@@ -14,22 +28,38 @@
 ////////////////////////////////////////////////////////
 int sc_main(int argc, char *argv[])
 {
+    int opt;
     //全局计数器生成
     sc_clock clk("clk", 10, SC_NS); //10ns一个周期，100MHZ
-    //   glb_cfg_c glb_cfg("temp_testcase.tab");
-    string glb_cfg_file;
-    string print_file;
-    if (argc == 2) {
-        glb_cfg_file = string("./tb/tc/") + argv[1] + string(".tab");
-        cout << glb_cfg_file << endl;
-        print_file = argv[1];
+
+    std::string glb_cfg_file;
+    std::string print_file;
+    std::string case_name(DEFAULT_CASE_NAME);
+
+    // 默认关闭模块日志打印
+    mod_lg_inst.disable();
+
+    // 命令行参数解析
+    while ((opt = getopt(argc, argv, "c:dh")) != -1) {
+        switch (opt) {
+        case 'c':
+            case_name = optarg;
+            break;
+        case 'd':
+            mod_lg_inst.enable();
+            break;
+        case 'h':
+            print_usage(argv[0]);
+            return 0;
+        default:
+            fprintf(stderr, "Unknown option: %c\n", opt);
+            return -1;
+        }
     }
-    if (argc == 1) {
-        glb_cfg_file = string("./tb/tc/") + string("TC_LEN_001") + string(".tab");
-        print_file = string("TC_LEN_001");
-    }
-    print_file = print_file + string(".stat");
-    cout << print_file << endl;
+
+    glb_cfg_file = std::string("./tb/tc/") + case_name + std::string(".tab");
+    print_file = case_name + string(".stat");
+    std::cout << "case name: " << case_name << std::endl;
 
     glb_cfg_c glb_cfg(glb_cfg_file);
 
