@@ -43,14 +43,21 @@ int sc_main(int argc, char *argv[])
     mod_lg_inst.disable();
 
     // 命令行参数解析
-    while ((opt = getopt(argc, argv, "c:dh")) != -1) {
+    while ((opt = getopt(argc, argv, "c:d:h")) != -1) {
         switch (opt) {
         case 'c':
             case_name = optarg;
-            case_dir = argv[optind];
+            if (argc > 3) {
+                case_dir = argv[optind];
+            }
             break;
         case 'd':
             mod_lg_inst.enable();
+            case_name = optarg;
+            if (argc > 3) {
+                case_dir = argv[optind];
+            }
+
             break;
         case 'h':
             print_usage(argv[0]);
