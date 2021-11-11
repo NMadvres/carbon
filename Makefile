@@ -35,6 +35,9 @@ format:
 	clang-format -i tb/src/*.h
 	clang-format -i $(SOURCES)
 
+test:
+	/usr/bin/python3 test_tc.py
+
 $(APPNAME): $(OBJECTS)
 	$(CXX) -o $(APPNAME) $(OBJECTS) $(LDFLAGS) $(LDLIBS)
 

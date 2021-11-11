@@ -14,10 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install packages
-      run: sudo apt-get install -y pkg-config libsystemc libsystemc-dev
+      run: sudo apt-get install -y pkg-config libsystemc libsystemc-dev python3
     - name: make
       run: make
     - name: clang-format lint
       uses: DoozyX/clang-format-lint-action@v0.12
       with:
         extensions: 'h,cpp'
+    - name: test
+      run: make test

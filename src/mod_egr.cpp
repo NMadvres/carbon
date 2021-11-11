@@ -80,8 +80,11 @@ void mod_egr::rev_pkt_process()
     if (in_port.event()) {
         s_pkt_desc tmp_pkt = in_port->read();
 
-        fifo_port.push_back(tmp_pkt);
-        get_token(tmp_pkt.dport);
+        if (fifo_port.size() < 50) {
+            fifo_port.push_back(tmp_pkt);
+        } else {
+            MOD_LOG_ERROR << "Egress Drop packet" << tmp_pkt;
+        }
     }
 }
 
@@ -111,7 +114,7 @@ void mod_egr::send_pkt_process()
     //for stat output bw
     top_stat->input_comm_stat_func(pkt);
     int top_delay = pkt.time_stamp.egr_out_clock - pkt.time_stamp.stm_out_clock;
-    top_stat->record_comm_latency_func(top_delay);
+    top_stat->record_comm_latency_func(pkt, top_delay);
 
     out_port[pkt.dport]->write(pkt);
     fifo_port.pop_front();

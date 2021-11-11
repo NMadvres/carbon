@@ -209,7 +209,7 @@ void mod_sch::send_cell_to_pe(int que_id)
         //stat out
         sch_stat->output_comm_stat_func(cur_cell);
         int delay_cycle = cur_cell.time_stamp.sch_out_clock - cur_cell.time_stamp.ing_out_clock;
-        sch_stat->record_comm_latency_func(delay_cycle);
+        sch_stat->record_comm_latency_func(cur_cell, delay_cycle);
         if (cur_cell.eop == true) {
             break;
         }

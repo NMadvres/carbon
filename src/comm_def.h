@@ -305,11 +305,11 @@ public:
 public:
     int m_que_num;
     //delay relate
-    int record_total_delay;
-    int record_max_delay;
-    int record_min_delay;
-    int record_avg_delay;
-    int record_delay_cnt;
+    vector<int> record_total_delay;
+    vector<int> record_max_delay;
+    vector<int> record_min_delay;
+    vector<int> record_avg_delay;
+    vector<int> record_delay_cnt;
     //bw relate
     int print_cnt;
     vector<int> input_que_pktlen_stat;
@@ -325,7 +325,7 @@ public:
     void input_record_bw_info(int que_id, int valid_len, int is_eop);
     void output_record_bw_info(int que_id, int valid_len, int is_eop);
     void drop_record_bw_info(int que_id, int valid_len, int is_eop);
-    void record_latency_info(int delay_cnt);
+    void record_latency_info(int que_id, int delay_cnt);
     void print_info(int stat_period);
 };
 
@@ -333,10 +333,11 @@ class func_stat
 {
 public:
     func_stat(string file_name, MODULE_TYPE base_mod_name);
-    void input_comm_stat_func(s_pkt_desc pkt_stat);
-    void output_comm_stat_func(s_pkt_desc pkt_stat);
-    void drop_comm_stat_func(s_pkt_desc pkt_stat);
-    void record_comm_latency_func(int delay_cnt);
+    void input_comm_stat_func(s_pkt_desc &pkt_stat);
+    void output_comm_stat_func(s_pkt_desc &pkt_stat);
+    void drop_comm_stat_func(s_pkt_desc &pkt_stat);
+    void record_comm_latency_func(s_pkt_desc &pkt_stat, int delay_cnt);
+    void check_enable_level(s_pkt_desc &pkt_stat);
     void print_info(int stat_period);
 
 public:

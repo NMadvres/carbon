@@ -56,11 +56,9 @@ int sc_main(int argc, char *argv[])
             return -1;
         }
     }
-
     glb_cfg_file = std::string("./tb/tc/") + case_name + std::string(".tab");
     print_file = case_name + string(".stat");
     std::cout << "case name: " << case_name << std::endl;
-
     glb_cfg_c glb_cfg(glb_cfg_file);
 
     //例化统计类

@@ -375,12 +375,13 @@ func_stat_base::func_stat_base(string file_name, MODULE_TYPE mod_name, Stat_BASE
     output_que_pktlen_stat.resize(m_que_num, 0);
     output_que_pktnum_stat.resize(m_que_num, 0);
     drop_que_pktnum_stat.resize(m_que_num, 0);
-    record_total_delay = 0;
+
     //延时相关
-    record_max_delay = 0;
-    record_min_delay = 0;
-    record_avg_delay = 0;
-    record_delay_cnt = 0;
+    record_total_delay.resize(m_que_num, 0);
+    record_max_delay.resize(m_que_num, 0);
+    record_min_delay.resize(m_que_num, 0);
+    record_avg_delay.resize(m_que_num, 0);
+    record_delay_cnt.resize(m_que_num, 0);
 
     //根据stat_base_on确定基于哪个纬度统计
     switch (stat_base_on) {
@@ -445,23 +446,23 @@ void func_stat_base::drop_record_bw_info(int que_id, int valid_len, int is_eop)
     }
 }
 
-void func_stat_base::record_latency_info(int delay_cnt)
+void func_stat_base::record_latency_info(int que_id, int delay_cnt)
 {
-    if (record_delay_cnt == 0) {
-        record_min_delay = delay_cnt;
-        record_max_delay = delay_cnt;
-        record_avg_delay = delay_cnt;
+    if (record_delay_cnt[que_id] == 0) {
+        record_min_delay[que_id] = delay_cnt;
+        record_max_delay[que_id] = delay_cnt;
+        record_avg_delay[que_id] = delay_cnt;
     }
 
-    if (delay_cnt < record_min_delay) {
-        record_min_delay = delay_cnt;
+    if (delay_cnt < record_min_delay[que_id]) {
+        record_min_delay[que_id] = delay_cnt;
     }
-    if (delay_cnt > record_max_delay) {
-        record_max_delay = delay_cnt;
+    if (delay_cnt > record_max_delay[que_id]) {
+        record_max_delay[que_id] = delay_cnt;
     }
-    record_total_delay += delay_cnt;
-    record_delay_cnt++;
-    record_avg_delay = record_total_delay / record_delay_cnt;
+    record_total_delay[que_id] += delay_cnt;
+    record_delay_cnt[que_id]++;
+    record_avg_delay[que_id] = record_total_delay[que_id] / record_delay_cnt[que_id];
 }
 
 void func_stat_base::print_info(int stat_period)
@@ -502,9 +503,9 @@ void func_stat_base::print_info(int stat_period)
         }
         dpd_pkts = drop_que_pktnum_stat[i];                                    // drop packet
         dpd_mpps = (double)drop_que_pktnum_stat[i] * G_FREQ_MHZ / stat_period; // drop_Mpps
-        avg_dly = record_avg_delay;
-        min_dly = record_min_delay;
-        max_dly = record_max_delay;
+        avg_dly = record_avg_delay[i];
+        min_dly = record_min_delay[i];
+        max_dly = record_max_delay[i];
 
         fprintf(m_fp, "%-10d    %-10d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8.2f    %-8d    %-8d    %-8d  %c",
                 i, send_bytes, send_mbps, send_pkts, send_mpps, rcvd_bytes, rcvd_mbps, rcvd_pkts, rcvd_mpps, dpd_pkts, dpd_mpps, avg_dly, min_dly, max_dly, 13);
@@ -535,41 +536,7 @@ func_stat::func_stat(string file_name, MODULE_TYPE base_mod_name)
     pri_enable_flag = 0;
     sport_enable_flag = 0;
     dport_enable_flag = 0;
-    switch (mod_name) {
-    case Module_stim:
-        file_add = "_stim";
-        sport_enable_flag = 1;
-        fid_enable_flag = 1;
-        break;
-    case Module_ing:
-        file_add = "_ing";
-        sport_enable_flag = 1;
-        fid_enable_flag = 1;
-        break;
-    case Module_sch:
-        file_add = "_sch";
-        pri_enable_flag = 1;
-        fid_enable_flag = 1;
-        break;
-    case Module_pe:
-        file_add = "_pe";
-        dport_enable_flag = 1;
-        fid_enable_flag = 1;
-        break;
-    case Module_egr:
-        file_add = "_egr";
-        dport_enable_flag = 1;
-        fid_enable_flag = 1;
-        break;
-    case Module_top:
-        file_add = "_top";
-        sport_enable_flag = 1;
-        dport_enable_flag = 1;
-        fid_enable_flag = 1;
-        que_enable_flag = 1;
-        pri_enable_flag = 1;
-        break;
-    }
+
     //file_name = file_name + file_add;
     file_name = file_name;
     //赋值统计数目
@@ -585,9 +552,32 @@ func_stat::func_stat(string file_name, MODULE_TYPE base_mod_name)
     sport_stat = new func_stat_base(file_name, mod_name, sport_level, port_size);
     dport_stat = new func_stat_base(file_name, mod_name, dport_level, port_size);
 }
-
-void func_stat::input_comm_stat_func(s_pkt_desc pkt_stat)
+void func_stat::check_enable_level(s_pkt_desc &pkt_stat)
 {
+    sport_enable_flag = 0;
+    dport_enable_flag = 0;
+    fid_enable_flag = 0;
+    que_enable_flag = 0;
+    pri_enable_flag = 0;
+    if (pkt_stat.sport != -1) {
+        sport_enable_flag = 1;
+    }
+    if (pkt_stat.dport != -1) {
+        dport_enable_flag = 1;
+    }
+    if (pkt_stat.fid != -1) {
+        fid_enable_flag = 1;
+    }
+    if (pkt_stat.qid != -1) {
+        que_enable_flag = 1;
+    }
+    if (pkt_stat.pri != -1) {
+        pri_enable_flag = 1;
+    }
+}
+void func_stat::input_comm_stat_func(s_pkt_desc &pkt_stat)
+{
+    check_enable_level(pkt_stat);
     if (fid_enable_flag == 1) {
         fid_stat->input_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
     }
@@ -613,8 +603,9 @@ void func_stat::input_comm_stat_func(s_pkt_desc pkt_stat)
     }
 }
 
-void func_stat::output_comm_stat_func(s_pkt_desc pkt_stat)
+void func_stat::output_comm_stat_func(s_pkt_desc &pkt_stat)
 {
+    check_enable_level(pkt_stat);
     if (fid_enable_flag == 1) {
         fid_stat->output_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
     }
@@ -640,8 +631,9 @@ void func_stat::output_comm_stat_func(s_pkt_desc pkt_stat)
     }
 }
 
-void func_stat::drop_comm_stat_func(s_pkt_desc pkt_stat)
+void func_stat::drop_comm_stat_func(s_pkt_desc &pkt_stat)
 {
+    check_enable_level(pkt_stat);
     if (fid_enable_flag == 1) {
         fid_stat->drop_record_bw_info(pkt_stat.fid, pkt_stat.len, pkt_stat.eop);
     }
@@ -659,22 +651,23 @@ void func_stat::drop_comm_stat_func(s_pkt_desc pkt_stat)
     }
 }
 
-void func_stat::record_comm_latency_func(int delay_cnt)
+void func_stat::record_comm_latency_func(s_pkt_desc &pkt_stat, int delay_cnt)
 {
+    check_enable_level(pkt_stat);
     if (fid_enable_flag == 1) {
-        fid_stat->record_latency_info(delay_cnt);
+        fid_stat->record_latency_info(pkt_stat.fid, delay_cnt);
     }
     if (que_enable_flag == 1) {
-        que_stat->record_latency_info(delay_cnt);
+        que_stat->record_latency_info(pkt_stat.qid, delay_cnt);
     }
     if (pri_enable_flag == 1) {
-        pri_stat->record_latency_info(delay_cnt);
+        pri_stat->record_latency_info(pkt_stat.pri, delay_cnt);
     }
     if (sport_enable_flag == 1) {
-        sport_stat->record_latency_info(delay_cnt);
+        sport_stat->record_latency_info(pkt_stat.sport, delay_cnt);
     }
     if (dport_enable_flag == 1) {
-        dport_stat->record_latency_info(delay_cnt);
+        dport_stat->record_latency_info(pkt_stat.dport, delay_cnt);
     }
 }
 void func_stat::print_info(int stat_period)
