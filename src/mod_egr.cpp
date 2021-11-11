@@ -103,11 +103,11 @@ void mod_egr::send_pkt_process()
     //4个端口轮询，获取发送
     for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
         if (fifo_port[port_id].empty())
-            return;
+            continue;
         s_pkt_desc &pkt = fifo_port[port_id].front();
 
         if ((pkt.len > get_token(pkt.dport)))
-            return;
+            continue;
 
         //增加时戳信息
         pkt.time_stamp.egr_out_clock = g_cycle_cnt;
