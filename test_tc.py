@@ -45,6 +45,8 @@ case_dir_all = case_dir + "/"
 
 if (case_sel == 1):
     os.system('./carbon -c %s %s' % (case_name, case_dir_all))
+    if (dir_sel == 1):
+        os.system('scp -r run_log/ %s' % case_dir_all)
 else:
     lst = os.listdir(case_dir)
     for c in lst:
@@ -52,7 +54,8 @@ else:
             case_name = os.path.splitext(c)[0]  # 分割，不带后缀名
             print('./carbon -c %s %s' % (case_name, case_dir_all))            
             os.system('./carbon -c %s %s' % (case_name, case_dir_all))
-
+    if (dir_sel == 1):
+        os.system('scp -r run_log/ %s' % case_dir_all)
 
 # os.system('scp -r run_log/ %s' % case_dir_all)
 # if (case_sel == 1) and (dir_sel == 1):   # case & &dir
