@@ -12,7 +12,8 @@ static void print_usage(const char *app_name)
     printf("Usage:\n"
            "  %s [options]\n"
            "Options:\n"
-           "  -c <case name>   Run the case\n"
+           "  -c <case name>   Run the case, default is " DEFAULT_CASE_NAME "\n"
+           "  -p <case path>   Path of the test case data, default is " DEFAULT_CASE_DIR "\n"
            "  -d               Print module debug log\n"
            "  -h               Print this help info\n",
            app_name);
@@ -43,21 +44,16 @@ int sc_main(int argc, char *argv[])
     mod_lg_inst.disable();
 
     // 命令行参数解析
-    while ((opt = getopt(argc, argv, "c:d:h")) != -1) {
+    while ((opt = getopt(argc, argv, "c:p:dh")) != -1) {
         switch (opt) {
         case 'c':
             case_name = optarg;
-            if (argc > 3) {
-                case_dir = argv[optind];
-            }
+            break;
+        case 'p':
+            case_dir = optarg;
             break;
         case 'd':
             mod_lg_inst.enable();
-            case_name = optarg;
-            if (argc > 3) {
-                case_dir = argv[optind];
-            }
-
             break;
         case 'h':
             print_usage(argv[0]);
