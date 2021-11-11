@@ -80,6 +80,11 @@ int sc_main(int argc, char *argv[])
         (*top_tb_mod.in_pkt_stat[i])(*egr_tb_sig[i]);
         (*top_tb_mod.out_pkt_stim[i])(*tb_ing_sig[i]);
     }
+
+    sc_signal<s_pkt_desc> egr_tb_bcpu_sig;
+    top_carbon_mod.out_egr_bcpu(egr_tb_bcpu_sig);
+    top_tb_mod.in_pkt_bcpu(egr_tb_bcpu_sig);
+
     //绑定入口主时钟
     top_tb_mod.in_glb_clk(clk);
     //绑定cnt计数

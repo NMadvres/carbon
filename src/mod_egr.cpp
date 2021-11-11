@@ -36,7 +36,7 @@ mod_egr::mod_egr(sc_module_name name, func_stat *base_top_stat):
     dont_initialize();
 
     SC_METHOD(rev_pkt_from_ing_process);
-    sensitive << in_pkt_bcpu;
+    sensitive << in_clk_cnt;
     dont_initialize();
 }
 
@@ -79,6 +79,7 @@ void mod_egr::rev_pkt_process()
 {
     if (in_port.event()) {
         s_pkt_desc tmp_pkt = in_port->read();
+
         fifo_port.push_back(tmp_pkt);
         get_token(tmp_pkt.dport);
     }
@@ -124,6 +125,8 @@ void mod_egr::send_pkt_to_cpu_process()
 
     s_pkt_desc &pkt = fifo_bcpu.front();
     if (pkt.qid == -2) {
-        //TODO
+        MOD_LOG << "egr_out_bcpu_pkt" << pkt;
+        out_bcpu->write(pkt);
+        fifo_bcpu.pop_front();
     }
 }

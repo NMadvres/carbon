@@ -28,6 +28,8 @@ public:
 public:
     sc_in<s_pkt_desc> in_port;
     std::array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_port;
+
+    sc_out<s_pkt_desc> out_bcpu;
     sc_in<int> in_clk_cnt;
 
     sc_fifo_in<s_pkt_desc> in_pkt_bcpu;
