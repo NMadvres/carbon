@@ -21,6 +21,7 @@ public:
 public:
     array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_pkt_stat;
     sc_in<int> in_clk_cnt;
+    sc_in<s_pkt_desc> in_bcpu;
     void recv_pkt_process();
 };
 

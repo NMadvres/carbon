@@ -22,11 +22,19 @@ public:
     dummy_bcpu(sc_module_name name):
         sc_module(name)
     {
-        //透传
-        out_port_to_stat = in_port_from_dut;
+        SC_METHOD(passtrough);
+        sensitive << in_port_from_dut;
+        dont_initialize();
     }
 
     SC_HAS_PROCESS(dummy_bcpu);
+
+    void passtrough()
+    {
+        auto pkt = in_port_from_dut.read();
+        out_port_to_stat.write(pkt);
+        MOD_LOG << "passthrough_bcpu_pkt" << pkt;
+    }
 };
 
 #endif // __DUMMY_BCPU_H__

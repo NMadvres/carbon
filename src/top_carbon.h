@@ -25,12 +25,15 @@ public:
     mod_egr *egr_mod;
     std::array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_ing_port;   // 用于透传连线ing的输入端口信号,在顶层连接发包器
     std::array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_egr_port; // 用于透传连线egr的输出端口信号,在顶层连接stat
-    sc_fifo<s_pkt_desc> *ing_sch_sig;                           // 用于连接ing和sch
-    sc_fifo<s_pkt_desc> *sch_pe_sig;                            // 用于连接ing和sch
-    sc_fifo<s_pkt_desc> *ing_egr_bcpu_sig;                      // 用于连接ing和egr
-    sc_signal<s_pkt_desc> pe_egr_sig;                           // 用于连接ing和sch
-    sc_signal<int> pe_sch_fc_sig;                               // 用于连接pe和sch,反压信号
-    sc_in<int> in_clk_cnt;                                      // 全局时钟计数，用于互联
+
+    sc_out<s_pkt_desc> out_egr_bcpu; // 用于透传连线egr的输出信号,在顶层连接BCPU
+
+    sc_fifo<s_pkt_desc> *ing_sch_sig;      // 用于连接ing和sch
+    sc_fifo<s_pkt_desc> *sch_pe_sig;       // 用于连接ing和sch
+    sc_fifo<s_pkt_desc> *ing_egr_bcpu_sig; // 用于连接ing和egr
+    sc_signal<s_pkt_desc> pe_egr_sig;      // 用于连接ing和sch
+    sc_signal<int> pe_sch_fc_sig;          // 用于连接pe和sch,反压信号
+    sc_in<int> in_clk_cnt;                 // 全局时钟计数，用于互联
 
 public: // 例化及互联部分
     top_carbon(sc_module_name name, func_stat *base_top_stat):
@@ -71,6 +74,10 @@ public: // 例化及互联部分
             ing_mod->in_port[i]->bind(*in_ing_port[i]);
             egr_mod->out_port[i]->bind(*out_egr_port[i]);
         }
+
+        //egress module link to bcpu
+        egr_mod->out_bcpu.bind(out_egr_bcpu);
+
         // 全局cnt互联
         ing_mod->in_clk_cnt(in_clk_cnt);
         sch_mod->in_clk_cnt(in_clk_cnt);
