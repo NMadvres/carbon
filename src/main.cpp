@@ -99,7 +99,7 @@ int sc_main(int argc, char *argv[])
     top_tb_mod.in_clk_cnt(cycle_cnt_sig);  //一发多收
     top_carbon_mod.in_clk_cnt(cycle_cnt_sig);
 
-    sc_start(10, SC_MS); //启动仿真
+    sc_start(1, SC_MS); //启动仿真
     top_tb_mod.stim_mod->~mod_stim();
     int simu_cycle = 1000 * 1000 / 10;
     top_stat->print_info(simu_cycle);
