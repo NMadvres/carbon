@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #define DEFAULT_CASE_NAME "TC_LEN_001"
+#define DEFAULT_CASE_DIR "./tb/tc/"
 
 static void print_usage(const char *app_name)
 {
@@ -34,7 +35,9 @@ int sc_main(int argc, char *argv[])
 
     std::string glb_cfg_file;
     std::string print_file;
+    std::string print_dir;
     std::string case_name(DEFAULT_CASE_NAME);
+    std::string case_dir(DEFAULT_CASE_DIR);
 
     // 默认关闭模块日志打印
     mod_lg_inst.disable();
@@ -44,6 +47,7 @@ int sc_main(int argc, char *argv[])
         switch (opt) {
         case 'c':
             case_name = optarg;
+            case_dir = argv[optind];
             break;
         case 'd':
             mod_lg_inst.enable();
@@ -56,14 +60,15 @@ int sc_main(int argc, char *argv[])
             return -1;
         }
     }
-    glb_cfg_file = std::string("./tb/tc/") + case_name + std::string(".tab");
+
+    glb_cfg_file = case_dir + case_name + std::string(".tab");
     print_file = case_name + string(".stat");
+    std::cout << "glb_cfg_file: " << glb_cfg_file << std::endl;
     std::cout << "case name: " << case_name << std::endl;
     glb_cfg_c glb_cfg(glb_cfg_file);
 
     //例化统计类
     func_stat *top_stat = new func_stat(print_file, Module_top);
-
     //子模块例化
     top_carbon top_carbon_mod("top_carbon", top_stat);
     top_tb top_tb_mod("top_tb", top_stat);
