@@ -63,12 +63,12 @@ int sc_main(int argc, char *argv[])
 
     glb_cfg_file = case_dir + case_name + std::string(".tab");
     print_file = case_name + string(".stat");
-    std::cout << "glb_cfg_file: " <<glb_cfg_file<< std::endl;
+    std::cout << "glb_cfg_file: " << glb_cfg_file << std::endl;
     std::cout << "case name: " << case_name << std::endl;
     glb_cfg_c glb_cfg(glb_cfg_file);
 
     //例化统计类
-      func_stat *top_stat = new func_stat(print_file, Module_top);
+    func_stat *top_stat = new func_stat(print_file, Module_top);
     //子模块例化
     top_carbon top_carbon_mod("top_carbon", top_stat);
     top_tb top_tb_mod("top_tb", top_stat);
