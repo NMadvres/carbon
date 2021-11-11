@@ -29,7 +29,6 @@ void mod_stat::recv_pkt_process()
     for (int i = 0; i < G_INTER_NUM; i++) {
         if ((*in_pkt_stat[i]).event()) {
             rd_pkt = in_pkt_stat[i]->read();
-            rd_pkt.len = rd_pkt.len;
             pkt_stat_err_check(rd_pkt);
         }
     }
