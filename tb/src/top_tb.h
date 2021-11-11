@@ -4,6 +4,7 @@
 #include "../../src/comm_def.h"
 #include "mod_stim.h"
 #include "mod_stat.h"
+#include "dummy_bcpu.h"
 #include "mod_testctrl.h"
 
 ////////////////////////////////////////////////////////
@@ -21,11 +22,16 @@ public: // 例化及互联部分
     mod_stim *stim_mod;
     mod_stat *stat_mod;
     mod_testctrl *testctrl_mod;
+
+    dummy_bcpu *bcpu_mod;
+    sc_in<s_pkt_desc> in_pkt_bcpu; //用于透传连线bcpu的输入端口信号,在顶层连接egr
+
     array<sc_in<s_pkt_desc> *, G_INTER_NUM> in_pkt_stat;   //用于透传连线stat的输入端口信号,在顶层连接egr
     array<sc_out<s_pkt_desc> *, G_INTER_NUM> out_pkt_stim; //用于透传连线stim的输出端口信号,在顶层连接ing
     sc_in_clk in_glb_clk;                                  // 用于透传连线testctrl输入信号,在顶层连接testctrl
     sc_out<int> out_clk_cnt;                               // 用于透传连线testctrl输出信号,在顶层连接testctrl
     sc_in<int> in_clk_cnt;                                 // 全局时钟计数，用于互联
+    sc_signal<s_pkt_desc> bcpu_stat_sig;
 
 public:
     top_tb(sc_module_name name, func_stat *base_top_stat):
@@ -40,6 +46,8 @@ public:
             out_pkt_stim[i] = new sc_out<s_pkt_desc>();
         }
 
+        bcpu_mod = new dummy_bcpu("bcpu_mod");
+
         //PORTING for all modules inside top_tb.
         //[stim module porting]
         //out_pkt_stim is to be link to ing via top_tb
@@ -53,6 +61,11 @@ public:
         //[stat moudule porting]
         for (int i = 0; i < G_INTER_NUM; i++) stat_mod->in_pkt_stat[i]->bind(*in_pkt_stat[i]);
         stat_mod->in_clk_cnt(in_clk_cnt);
+
+        bcpu_mod->in_port_from_dut.bind(in_pkt_bcpu);
+
+        bcpu_mod->out_port_to_stat(bcpu_stat_sig);
+        stat_mod->in_bcpu(bcpu_stat_sig);
     }
 
     SC_HAS_PROCESS(top_tb);
