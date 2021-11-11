@@ -20,6 +20,7 @@ mod_egr::mod_egr(sc_module_name name, func_stat *base_top_stat):
         out_port[i] = new sc_out<s_pkt_desc>();
         port_token_bucket[i] = clk_gap;
     }
+    fifo_port.resize(G_INTER_NUM);
 
     assert(clk_gap > 0);
 
@@ -79,9 +80,9 @@ void mod_egr::rev_pkt_process()
 {
     if (in_port.event()) {
         s_pkt_desc tmp_pkt = in_port->read();
-
-        if (fifo_port.size() < 50) {
-            fifo_port.push_back(tmp_pkt);
+        int dport_id = tmp_pkt.dport;
+        if (fifo_port[dport_id].size() < 50) {
+            fifo_port[dport_id].push_back(tmp_pkt);
         } else {
             MOD_LOG_ERROR << "Egress Drop packet" << tmp_pkt;
         }
@@ -99,26 +100,28 @@ void mod_egr::send_pkt_process()
     }
     cycle_cnt++;
 
-    if (fifo_port.empty())
-        return;
+    //4个端口轮询，获取发送
+    for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
+        if (fifo_port[port_id].empty())
+            return;
+        s_pkt_desc &pkt = fifo_port[port_id].front();
 
-    s_pkt_desc &pkt = fifo_port.front();
+        if ((pkt.len > get_token(pkt.dport)))
+            return;
 
-    if ((pkt.len > get_token(pkt.dport)))
-        return;
+        //增加时戳信息
+        pkt.time_stamp.egr_out_clock = g_cycle_cnt;
+        port_send_bytes[pkt.dport] += pkt.len;
 
-    //增加时戳信息
-    pkt.time_stamp.egr_out_clock = g_cycle_cnt;
-    port_send_bytes[pkt.dport] += pkt.len;
+        //for stat output bw
+        top_stat->input_comm_stat_func(pkt);
+        int top_delay = pkt.time_stamp.egr_out_clock - pkt.time_stamp.stm_out_clock;
+        top_stat->record_comm_latency_func(pkt, top_delay);
 
-    //for stat output bw
-    top_stat->input_comm_stat_func(pkt);
-    int top_delay = pkt.time_stamp.egr_out_clock - pkt.time_stamp.stm_out_clock;
-    top_stat->record_comm_latency_func(pkt, top_delay);
-
-    out_port[pkt.dport]->write(pkt);
-    fifo_port.pop_front();
-    sub_token(pkt.len, pkt.dport);
+        out_port[pkt.dport]->write(pkt);
+        fifo_port[port_id].pop_front();
+        sub_token(pkt.len, pkt.dport);
+    }
 }
 
 void mod_egr::send_pkt_to_cpu_process()

@@ -79,18 +79,18 @@ void mod_sch::rev_pkt_process()
         if (que_id < 0) {
             continue;
         }
-        //增加状态判断，确定是否处于丢弃状态，对于SOP切片判断，如需丢弃则flag拉起
+        //增加状态判断，确定是否处于丢弃状态，对于SOP切片判断，如需丢弃则flag拉起;9600/64=150.需要设置成150个
         MOD_LOG << "cur_cycle" << g_cycle_cnt << "   recv ing packet " << rd_pkt << "que size" << input_cell_que[que_id].size();
         if (rd_pkt.sop) {
             if (input_drop_flag[que_id] == 0) {
-                if (input_cell_que[que_id].size() > 100) {
+                if (input_cell_que[que_id].size() > 300) {
                     input_drop_flag[que_id] = 1;
                 } else {
                     input_drop_flag[que_id] = 0;
                 }
             }
             if (input_drop_flag[que_id] == 1) {
-                if (input_cell_que[que_id].size() > 100) {
+                if (input_cell_que[que_id].size() > 300) {
                     input_drop_flag[que_id] = 1;
                 } else {
                     input_drop_flag[que_id] = 0;
