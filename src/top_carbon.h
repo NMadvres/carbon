@@ -51,15 +51,15 @@ public: // 例化及互联部分
         }
 
         // 互联
-        ing_sch_sig = new sc_fifo<s_pkt_desc>(256);
+        ing_sch_sig = new sc_fifo<s_pkt_desc>(1024);
         ing_mod->out_cell_que(*ing_sch_sig);
         sch_mod->in_cell_que(*ing_sch_sig); // 绑定ing和sch
 
-        ing_egr_bcpu_sig = new sc_fifo<s_pkt_desc>(256);
+        ing_egr_bcpu_sig = new sc_fifo<s_pkt_desc>(1024);
         ing_mod->out_pkt_bcpu(*ing_egr_bcpu_sig); // 绑定ing和egr
         egr_mod->in_pkt_bcpu(*ing_egr_bcpu_sig);  // 绑定ing和egr
 
-        sch_pe_sig = new sc_fifo<s_pkt_desc>(256);
+        sch_pe_sig = new sc_fifo<s_pkt_desc>(1024);
         sch_mod->out_cell_que(*sch_pe_sig);
         pe_mod->in_cell_que(*sch_pe_sig); // 绑定sch和pe
 

@@ -34,7 +34,7 @@ public:
 
     sc_fifo_in<s_pkt_desc> in_pkt_bcpu;
 
-    std::deque<s_pkt_desc> fifo_port;
+    vector<std::deque<s_pkt_desc>> fifo_port;
     std::deque<s_pkt_desc> fifo_bcpu;
     int pkt_count_port;
     func_stat *top_stat;
