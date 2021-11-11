@@ -70,7 +70,7 @@ void mod_stat::pkt_stat_err_check(s_pkt_desc pkt)
     if (DESC_TYPE_PKT != pkt.type) {
         err_list_stat.type_err_cnt++;
 
-        if (err_list_stat.type_err_cnt)
+        if (err_list_stat.type_err_cnt == 1)
             err_list_stat.err_var_sum++;
     }
 
