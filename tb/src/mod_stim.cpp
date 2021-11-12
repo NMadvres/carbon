@@ -75,7 +75,11 @@ mod_stim::mod_stim(sc_module_name name, func_stat *base_top_stat):
     flow_rule_nomatch.dport = 0;
     flow_rule_nomatch.qid = -1;
     flow_rule_nomatch.len2add = -1;
+<<<<<<< HEAD
     flow_rule_nomatch.flow_speed = 0;
+=======
+    flow_rule_nomatch.flow_speed = 100;
+>>>>>>> test_dev
 
     SC_THREAD(stim_prc);
     sensitive << in_clk_cnt;
