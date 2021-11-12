@@ -13,7 +13,7 @@
 
 #define mod_ing_print
 
-//#define mod_ing_stat_print
+#define mod_ing_stat_print
 
 mod_ing::mod_ing(sc_module_name name):
     sc_module(name)
@@ -221,25 +221,27 @@ void mod_ing::pkt_to_cell_process()
                 dport_pkt_cell_cnt[i]++;
                 dport_pkt_cnt[i]++;
             }
-            MOD_LOG("dport%d_pkt_cnt:%d,dport%d_pkt_cell_cnt:%d", i, dport_pkt_cnt[i], i, dport_pkt_cell_cnt[i]);
+            MOD_LOG << "dport" << i << "_pkt_cnt:" << dport_pkt_cnt[i] << ", dport" << i << "_pkt_cell_cnt:" << dport_pkt_cell_cnt[i] << endl;
+            //           cou("dport%d_pkt_cnt:%d,dport%d_pkt_cell_cnt:%d", i, dport_pkt_cnt[i], i, dport_pkt_cell_cnt[i]);
         }
         for (int i = 0; i < G_QUE_NUM; i++) {
             if (cell_trans.qid == i) {
                 que_pkt_cell_cnt[i]++;
                 que_pkt_cnt[i]++;
             }
-            MOD_LOG("que%d_pkt_cnt:%d,que%d_pkt_cell_cnt:%d", i, que_pkt_cnt[i], i, que_pkt_cell_cnt[i]);
+            MOD_LOG << "que" << i << "_pkt_cnt:" << que_pkt_cnt[i] << ", que" << i << "_pkt_cell_cnt" << que_pkt_cell_cnt[i] << endl;
         }
         for (int i = 0; i < 16; i++) {
             if (cell_trans.fid == i) {
                 flow_pkt_cell_cnt[i]++;
                 flow_pkt_cnt[i]++;
             }
-            MOD_LOG("flow%d_pkt_cnt:%d,flow%d_pkt_cell_cnt:%d", i, flow_pkt_cnt[i], i, flow_pkt_cell_cnt[i]);
+            //           MOD_LOG<<"flow%d_pkt_cnt:%d,flow%d_pkt_cell_cnt:%d"<<i<<flow_pkt_cnt[i]<<i<<flow_pkt_cell_cnt[i];
+            MOD_LOG << "flow" << i << "_pkt_cnt:" << flow_pkt_cnt[i] << ", flow" << i << "_pkt_cell_cnt" << flow_pkt_cell_cnt[i] << endl;
         }
         if (cell_trans.dport == 254) {
             bcpu_pkt_cnt++;
-            MOD_LOG("bcpu_pkt_cnt:%d", bcpu_pkt_cnt);
+            MOD_LOG << "bcpu_pkt_cnt:" << bcpu_pkt_cnt;
         }
 
 #endif
