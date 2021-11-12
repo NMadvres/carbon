@@ -75,7 +75,7 @@ mod_stim::mod_stim(sc_module_name name, func_stat *base_top_stat):
     flow_rule_nomatch.dport = 0;
     flow_rule_nomatch.qid = -1;
     flow_rule_nomatch.len2add = -1;
-    flow_rule_nomatch.flow_speed = 10;
+    flow_rule_nomatch.flow_speed = 0;
 
     SC_THREAD(stim_prc);
     sensitive << in_clk_cnt;
@@ -205,7 +205,7 @@ void mod_stim::stim_prc()
         }
         //
         // generate desc packet to bcpu
-        if (0) {
+        if (1) {
             send_pkt_port = flow_rule_nomatch.sport;
 
             pkt_desc_tmp.type = 0;
