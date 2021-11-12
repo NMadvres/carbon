@@ -359,6 +359,86 @@ public:
     static func_stat *global_init_stat;
 };
 
+//校验错误汇总
+struct s_err_list
+{
+    int err_var_sum;    // 下列错误中计数非0的种类总数
+    int inport_err_cnt; // 收到报文和dport值不对应的报文计数
+    int fid_err_cnt;    // fid 超预期的报文计数
+    int type_err_cnt;   // type 不为0的报文计数
+    int fsn_err_cnt;    // fsn 不合理的报文计数
+    int hash_err_cnt;   // sid/did/pri与 fid 不符合的计数
+    int len_err_cnt;    // 长度不符合流表的报文计数
+    int sport_err_cnt;  // sport 不符合流表的报文计数
+    int dport_err_cnt;  // dport 不符合流表的报文计数
+    int qid_err_cnt;    // qid 不符合流表的计数
+
+    //default value setting for s_err_list constructor
+    s_err_list()
+    {
+        err_var_sum = 0;
+        inport_err_cnt = 0;
+        fid_err_cnt = 0;
+        type_err_cnt = 0;
+        fsn_err_cnt = 0;
+        hash_err_cnt = 0;
+        len_err_cnt = 0;
+        sport_err_cnt = 0;
+        dport_err_cnt = 0;
+        qid_err_cnt = 0;
+    }
+
+    inline bool operator==(const s_err_list &T_class) const
+    {
+        return ((T_class.err_var_sum == err_var_sum)
+                && (T_class.inport_err_cnt == inport_err_cnt)
+                && (T_class.fid_err_cnt == fid_err_cnt)
+                && (T_class.type_err_cnt == type_err_cnt)
+                && (T_class.fsn_err_cnt == fsn_err_cnt)
+                && (T_class.hash_err_cnt == hash_err_cnt)
+                && (T_class.len_err_cnt == len_err_cnt)
+                && (T_class.sport_err_cnt == sport_err_cnt)
+                && (T_class.dport_err_cnt == dport_err_cnt)
+                && (T_class.qid_err_cnt == qid_err_cnt));
+    }
+};
+
+inline ostream &operator<<(ostream &out, const s_err_list &T_class)
+{
+    out << "@" << sc_time_stamp()
+        << " [evs:" << (T_class.err_var_sum)
+        << ", iec:" << (T_class.inport_err_cnt)
+        << ", fec:" << (T_class.fid_err_cnt)
+        << ", tec:" << (T_class.type_err_cnt)
+        << ", nec:" << (T_class.fsn_err_cnt)
+        << ", hec:" << (T_class.hash_err_cnt)
+        << ", lec:" << (T_class.len_err_cnt)
+        << ", sec:" << (T_class.sport_err_cnt)
+        << ", dec:" << (T_class.dport_err_cnt)
+        << ", qec:" << (T_class.qid_err_cnt)
+        << "] " << endl;
+    return out;
+}
+
+inline void
+#if defined(SC_API_VERSION_STRING)
+sc_trace(sc_trace_file *tf, const s_err_list &T_class, const std::string &name)
+#else
+sc_trace(sc_trace_file *tf, const s_err_list &T_class, const sc_string &name)
+#endif
+{
+    sc_trace(tf, T_class.err_var_sum, name + ".evs");
+    sc_trace(tf, T_class.inport_err_cnt, name + ".iec");
+    sc_trace(tf, T_class.fid_err_cnt, name + ".fec");
+    sc_trace(tf, T_class.type_err_cnt, name + ".tec");
+    sc_trace(tf, T_class.fsn_err_cnt, name + ".nec");
+    sc_trace(tf, T_class.hash_err_cnt, name + ".hec");
+    sc_trace(tf, T_class.len_err_cnt, name + ".lec");
+    sc_trace(tf, T_class.sport_err_cnt, name + ".sec");
+    sc_trace(tf, T_class.dport_err_cnt, name + ".dec");
+    sc_trace(tf, T_class.qid_err_cnt, name + ".qec");
+}
+
 #define ASSERT(A) (assert(A))
 
 class mod_logger: public logger::console_logger
