@@ -24,6 +24,10 @@ public:
     sc_in<s_pkt_desc> in_bcpu;
     void recv_pkt_process();
     void pkt_stat_err_check(s_pkt_desc pkt);
+    s_flow_rule flow_rule;
+    s_hash_rule_key hash_pkt_lut_key;
+    s_err_list err_list_stat;
+    array<int, G_FLOW_NUM> fsn_cache;
 };
 
 #endif // __MOD_STAT_H__
