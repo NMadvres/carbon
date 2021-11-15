@@ -69,8 +69,10 @@ void mod_stat::pkt_stat_err_check(s_pkt_desc pkt)
                                 + int(err_list_stat.len_err_cnt > 0)
                                 + int(err_list_stat.sport_err_cnt > 0)
                                 + int(err_list_stat.qid_err_cnt > 0)
-								+ int(err_list_stat.dport_err_cnt > 0);
- 
+                                + int(err_list_stat.dport_err_cnt > 0);
+
     top_stat->record_err_info(err_list_stat);
-    MOD_LOG_ERROR << "stat error packet" << err_list_stat;
+    if ((err_list_stat.err_var_sum > 0) || (in_clk_cnt > G_CYCLES_TOSTIM)) {
+        MOD_LOG_ERROR << "stat error packet" << err_list_stat;
+    }
 }
