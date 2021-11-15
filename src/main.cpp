@@ -101,7 +101,7 @@ int sc_main(int argc, char *argv[])
 
     sc_start(G_US_TORUN, SC_US); //启动仿真
     top_tb_mod.stim_mod->~mod_stim();
-    int simu_cycle = 1000 * 1000 / 10;
+    int simu_cycle = G_US_TORUN * G_FREQ_MHZ;
     top_stat->print_info(simu_cycle);
     return 0;
 }
