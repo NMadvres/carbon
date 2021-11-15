@@ -15,6 +15,9 @@ mod_stat::mod_stat(sc_module_name name):
     for (int i = 0; i < G_INTER_NUM; i++) {
         in_pkt_stat[i] = new sc_in<s_pkt_desc>();
     }
+    for (int i = 0; i < G_FLOW_NUM; i++) {
+        fsn_cache[i] = -1;
+    }
     SC_METHOD(recv_pkt_process);
     for (int i = 0; i < G_INTER_NUM; i++) {
         sensitive << *in_pkt_stat[i];
@@ -29,6 +32,7 @@ void mod_stat::recv_pkt_process()
     for (int i = 0; i < G_INTER_NUM; i++) {
         if ((*in_pkt_stat[i]).event()) {
             rd_pkt = in_pkt_stat[i]->read();
+            if (rd_pkt.dport != i) err_list_stat.inport_err_cnt++; // check input source inport_err_cnt
             pkt_stat_err_check(rd_pkt);
         }
     }
@@ -36,60 +40,35 @@ void mod_stat::recv_pkt_process()
 
 void mod_stat::pkt_stat_err_check(s_pkt_desc pkt)
 {
-    s_flow_rule flow_rule;
-    s_hash_rule_key hash_pkt_lut_key;
-    s_err_list err_list_stat;
-
-    if (pkt.fid > 16) {
-        err_list_stat.fid_err_cnt++;
-        return;
-    }
-
+    // cache the flow rule table item
     flow_rule = g_flow_rule_tab[pkt.fid];
-    if (flow_rule.sid != pkt.sid) {
-        err_list_stat.sport_err_cnt++;
-
-        if (err_list_stat.sport_err_cnt == 1)
-            err_list_stat.err_var_sum++;
-    }
-
-    if (flow_rule.did != pkt.did) {
-        err_list_stat.dport_err_cnt++;
-
-        if (err_list_stat.dport_err_cnt == 1)
-            err_list_stat.err_var_sum++;
-    }
-
-    if ((flow_rule.len + flow_rule.len2add) != pkt.len) {
-        err_list_stat.len_err_cnt++;
-
-        if (err_list_stat.len_err_cnt)
-            err_list_stat.err_var_sum++;
-    }
-
-    if (DESC_TYPE_PKT != pkt.type) {
-        err_list_stat.type_err_cnt++;
-
-        if (err_list_stat.type_err_cnt == 1)
-            err_list_stat.err_var_sum++;
-    }
-
-    hash_pkt_lut_key.sid = pkt.sid;
-    hash_pkt_lut_key.did = pkt.did;
-    hash_pkt_lut_key.pri = pkt.pri;
-    auto iter = g_hash_rule_tab.find(hash_pkt_lut_key);
-    if (iter == g_hash_rule_tab.end()) { //check hash
-        err_list_stat.hash_err_cnt++;
-
-        if (err_list_stat.hash_err_cnt == 1)
-            err_list_stat.err_var_sum++;
-    }
-
-    //TODO
-    /*
-		* inport error check & fsn error check
-		*
-		*/
+    //check fid and update fid_err_cnt
+    if (pkt.fid > int(g_flow_rule_tab.size())) err_list_stat.fid_err_cnt++;
+    //check type and update type_err_cnt
+    if (pkt.type != DESC_TYPE_PKT) err_list_stat.type_err_cnt++;
+    //check fsn and update fsn_err_cnt
+    if (pkt.fsn != fsn_cache[pkt.fid] + 1) err_list_stat.fsn_err_cnt++;
+    fsn_cache[pkt.fid] = pkt.fsn;
+    //check sid/did/pri and update hash_err_cnt
+    if ((flow_rule.sid != pkt.sid) || (flow_rule.did != pkt.did) || (flow_rule.pri != pkt.pri)) err_list_stat.hash_err_cnt++;
+    //check len and update len_err_cnt
+    if (pkt.len != (flow_rule.len + flow_rule.len2add)) err_list_stat.len_err_cnt++;
+    //check sport and update sport_err_cnt
+    if (pkt.sport != flow_rule.sport) err_list_stat.sport_err_cnt++;
+    //check qid and update qid_err_cnt
+    if (pkt.qid != flow_rule.qid) err_list_stat.qid_err_cnt++;
+    //check dport and update dport_err_cnt
+    if (pkt.dport != flow_rule.dport) err_list_stat.dport_err_cnt++;
+    //sum up err_var_sum
+    err_list_stat.err_var_sum = int(err_list_stat.inport_err_cnt > 0)
+                                + int(err_list_stat.fid_err_cnt > 0)
+                                + int(err_list_stat.type_err_cnt > 0)
+                                + int(err_list_stat.fsn_err_cnt > 0)
+                                + int(err_list_stat.hash_err_cnt > 0)
+                                + int(err_list_stat.len_err_cnt > 0)
+                                + int(err_list_stat.sport_err_cnt > 0)
+                                + int(err_list_stat.qid_err_cnt > 0)
+                                + int(err_list_stat.dport_err_cnt > 0);
 
     MOD_LOG_ERROR << "stat error packet" << err_list_stat;
 }
