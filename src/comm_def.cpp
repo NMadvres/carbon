@@ -269,7 +269,7 @@ void WRR_SCH::set_que_valid(int que_id, bool valid_flag)
 
 bool WRR_SCH::get_sch_result(int &rst_que)
 {
-    //如果所有队列weight 减为0，统一刷新
+    //如果所有活跃队列weight 减为0，统一刷新
     bool update_weight_flag = true;
     for (int index = 0; index < que_num; index++) {
         if ((cur_weight[index] > 0) && (que_status[index] == 1)) {
@@ -486,7 +486,7 @@ void func_stat_base::print_info(int stat_period)
     int avg_dly;
     int min_dly;
     int max_dly;
-    fprintf(m_fp, "%-10s    send_bytes    send_mbps   send_pkts   send_mpps   rcvd_bytes  rcvd_mbps   rcvd_pkts   rcvd_mpps   dpd_pkts    dpd_mpps    avg_dly     min_dly    max_dly  %c",
+    fprintf(m_fp, "%-10s    send_bytes    send_mBps   send_pkts   send_mpps   rcvd_bytes  rcvd_mBps   rcvd_pkts   rcvd_mpps   dpd_pkts    dpd_mpps    avg_dly     min_dly    max_dly  %c",
             pre_print_name.c_str(), 13);
     for (int i = 0; i < m_que_num; i++) {
         //计算que带宽bps和PPS，基于que计算
@@ -538,7 +538,7 @@ func_stat::func_stat(string file_name, MODULE_TYPE base_mod_name)
     dport_enable_flag = 0;
 
     //file_name = file_name + file_add;
-    file_name = file_name;
+    g_file_name = file_name;
     //赋值统计数目
     pri_size = G_PRI_NUM;
     que_size = g_que_rule_tab.size();
@@ -546,11 +546,11 @@ func_stat::func_stat(string file_name, MODULE_TYPE base_mod_name)
     port_size = g_port_rule_tab.size();
 
     //例化统计子控件
-    fid_stat = new func_stat_base(file_name, mod_name, fid_level, fid_size);
-    que_stat = new func_stat_base(file_name, mod_name, que_level, que_size);
-    pri_stat = new func_stat_base(file_name, mod_name, pri_level, pri_size);
-    sport_stat = new func_stat_base(file_name, mod_name, sport_level, port_size);
-    dport_stat = new func_stat_base(file_name, mod_name, dport_level, port_size);
+    fid_stat = new func_stat_base(g_file_name, mod_name, fid_level, fid_size);
+    que_stat = new func_stat_base(g_file_name, mod_name, que_level, que_size);
+    pri_stat = new func_stat_base(g_file_name, mod_name, pri_level, pri_size);
+    sport_stat = new func_stat_base(g_file_name, mod_name, sport_level, port_size);
+    dport_stat = new func_stat_base(g_file_name, mod_name, dport_level, port_size);
 }
 void func_stat::check_enable_level(s_pkt_desc &pkt_stat)
 {
@@ -670,6 +670,34 @@ void func_stat::record_comm_latency_func(s_pkt_desc &pkt_stat, int delay_cnt)
         dport_stat->record_latency_info(pkt_stat.dport, delay_cnt);
     }
 }
+
+void func_stat::record_err_info(s_err_list &err_info)
+{
+    total_err_stat.err_var_sum += err_info.err_var_sum;
+    total_err_stat.inport_err_cnt += err_info.inport_err_cnt;
+    total_err_stat.fid_err_cnt += err_info.fid_err_cnt;
+    total_err_stat.type_err_cnt += err_info.type_err_cnt;
+    total_err_stat.fsn_err_cnt += err_info.fsn_err_cnt;
+    total_err_stat.hash_err_cnt += err_info.hash_err_cnt;
+    total_err_stat.len_err_cnt += err_info.len_err_cnt;
+    total_err_stat.sport_err_cnt += err_info.sport_err_cnt;
+    total_err_stat.dport_err_cnt += err_info.dport_err_cnt;
+    total_err_stat.qid_err_cnt += err_info.qid_err_cnt;
+}
+
+void func_stat::print_err_info()
+{
+    string m_file_name = "run_log/" + g_file_name;
+    FILE *m_fp = fopen(m_file_name.c_str(), "aw+");
+    if (m_fp == NULL) {
+        ASSERT(0);
+    }
+    fprintf(m_fp, "evs:%d,      iec:%d,     fec:%d,     tec:%d , nec:%d,    hec:%d,    lec:%d,     sec:%d ,     dec:%d ,    qec:%d      %c",
+            total_err_stat.err_var_sum, total_err_stat.inport_err_cnt, total_err_stat.fid_err_cnt, total_err_stat.type_err_cnt, total_err_stat.fsn_err_cnt, total_err_stat.hash_err_cnt,
+            total_err_stat.len_err_cnt, total_err_stat.sport_err_cnt, total_err_stat.dport_err_cnt, total_err_stat.qid_err_cnt, 13);
+    fclose(m_fp);
+}
+
 void func_stat::print_info(int stat_period)
 {
     if (fid_enable_flag == 1) {
@@ -687,4 +715,5 @@ void func_stat::print_info(int stat_period)
     if (que_enable_flag == 1) {
         que_stat->print_info(stat_period);
     }
+    print_err_info();
 }

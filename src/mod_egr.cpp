@@ -111,7 +111,7 @@ void mod_egr::send_pkt_process()
 
         //增加时戳信息
         pkt.time_stamp.egr_out_clock = g_cycle_cnt;
-        port_send_bytes[pkt.dport] += pkt.len;
+        //port_send_bytes[pkt.dport] += pkt.len;
 
         //for stat output bw
         top_stat->input_comm_stat_func(pkt);

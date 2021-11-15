@@ -15,7 +15,7 @@
 class mod_stat: public sc_module
 {
 public:
-    mod_stat(sc_module_name name);
+    mod_stat(sc_module_name name, func_stat *base_top_stat);
     SC_HAS_PROCESS(mod_stat);
 
 public:
@@ -24,6 +24,7 @@ public:
     sc_in<s_pkt_desc> in_bcpu;
     void recv_pkt_process();
     void pkt_stat_err_check(s_pkt_desc pkt);
+	func_stat *top_stat;
     s_flow_rule flow_rule;
     s_hash_rule_key hash_pkt_lut_key;
     s_err_list err_list_stat;
