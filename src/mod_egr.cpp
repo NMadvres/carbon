@@ -15,6 +15,7 @@ mod_egr::mod_egr(sc_module_name name, func_stat *base_top_stat):
     //for stat
     top_stat = base_top_stat;
     cycle_cnt = 0;
+    is_busy = false;
 
     for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
@@ -81,11 +82,8 @@ void mod_egr::rev_pkt_process()
     if (in_port.event()) {
         s_pkt_desc tmp_pkt = in_port->read();
         int dport_id = tmp_pkt.dport;
-        if (fifo_port[dport_id].size() < 50) {
-            fifo_port[dport_id].push_back(tmp_pkt);
-        } else {
-            MOD_LOG_ERROR << "Egress Drop packet" << tmp_pkt;
-        }
+        fifo_port[dport_id].push_back(tmp_pkt);
+        MOD_LOG << "Egress recv packet from PE" << tmp_pkt;
     }
 }
 
@@ -99,6 +97,17 @@ void mod_egr::send_pkt_process()
         }
     }
     cycle_cnt++;
+
+    //流控状态判断
+    for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
+        if (fifo_port[port_id].size() >= 50) {
+            if (is_busy == false) {
+                is_busy = true;
+                out_egress_busy.write(1);
+                MOD_LOG << "Egress generate flow ctrl to PE";
+            }
+        }
+    }
 
     //4个端口轮询，获取发送
     for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
@@ -121,6 +130,15 @@ void mod_egr::send_pkt_process()
         out_port[pkt.dport]->write(pkt);
         fifo_port[port_id].pop_front();
         sub_token(pkt.len, pkt.dport);
+
+        //流控状态判断
+        if (fifo_port[port_id].size() < 50) {
+            if (is_busy == true) {
+                is_busy = false;
+                out_egress_busy.write(0);
+                MOD_LOG << "Egress cancel flow ctrl to PE" << pkt;
+            }
+        }
     }
 }
 

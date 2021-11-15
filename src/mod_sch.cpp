@@ -102,7 +102,7 @@ void mod_sch::rev_pkt_process()
             MOD_LOG << "cur_cycle" << g_cycle_cnt << "  drop packet" << rd_pkt;
         }
 
-        if (input_cell_que[que_id].size() > 1000) {
+        if (input_cell_que[que_id].size() > 500) {
             MOD_LOG << "input_cell_que overflow size:" << input_cell_que[que_id].size();
             ASSERT(0);
         }

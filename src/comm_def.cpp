@@ -673,16 +673,16 @@ void func_stat::record_comm_latency_func(s_pkt_desc &pkt_stat, int delay_cnt)
 
 void func_stat::record_err_info(s_err_list &err_info)
 {
-    total_err_stat.err_var_sum += err_info.err_var_sum;
-    total_err_stat.inport_err_cnt += err_info.inport_err_cnt;
-    total_err_stat.fid_err_cnt += err_info.fid_err_cnt;
-    total_err_stat.type_err_cnt += err_info.type_err_cnt;
-    total_err_stat.fsn_err_cnt += err_info.fsn_err_cnt;
-    total_err_stat.hash_err_cnt += err_info.hash_err_cnt;
-    total_err_stat.len_err_cnt += err_info.len_err_cnt;
-    total_err_stat.sport_err_cnt += err_info.sport_err_cnt;
-    total_err_stat.dport_err_cnt += err_info.dport_err_cnt;
-    total_err_stat.qid_err_cnt += err_info.qid_err_cnt;
+    total_err_stat.err_var_sum = err_info.err_var_sum;
+    total_err_stat.inport_err_cnt = err_info.inport_err_cnt;
+    total_err_stat.fid_err_cnt = err_info.fid_err_cnt;
+    total_err_stat.type_err_cnt = err_info.type_err_cnt;
+    total_err_stat.fsn_err_cnt = err_info.fsn_err_cnt;
+    total_err_stat.hash_err_cnt = err_info.hash_err_cnt;
+    total_err_stat.len_err_cnt = err_info.len_err_cnt;
+    total_err_stat.sport_err_cnt = err_info.sport_err_cnt;
+    total_err_stat.dport_err_cnt = err_info.dport_err_cnt;
+    total_err_stat.qid_err_cnt = err_info.qid_err_cnt;
 }
 
 void func_stat::print_err_info()

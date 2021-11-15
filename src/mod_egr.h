@@ -36,6 +36,10 @@ public:
 
     vector<std::deque<s_pkt_desc>> fifo_port;
     std::deque<s_pkt_desc> fifo_bcpu;
+    //fc signal
+    sc_out<int> out_egress_busy;
+    bool is_busy;
+
     int pkt_count_port;
     func_stat *top_stat;
     int cycle_cnt;
