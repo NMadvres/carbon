@@ -1,5 +1,13 @@
 #include "mod_stim.h"
-
+////////////////////////////////////////////////////////
+// Project： SystemC虚拟项目
+// Module:   mod_stim
+// Description: mod_stim 报文激励模块cpp文件
+// Group：预研组
+// Author: John
+// Date: 2021.10.14 第一版
+// Hierarchy : 编号，索引公共库
+////////////////////////////////////////////////////////
 void port_fifo::pkt_in(const s_pkt_desc &data_pkt)
 {
     regs[pntr++] = data_pkt;
