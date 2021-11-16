@@ -31,8 +31,8 @@ const int G_FLOW_NUM = 16;
 const int G_CELL_LEN = 64;
 const int G_PRI_NUM = 4;
 const int G_PE_MPPS = 50;
-const int G_CYCLES_TOSTIM = 1000000; //to run this many cycles equal to G_CYCLES_TORUN / G_CYCLES_TORUN us
-const int G_CYCLES_TOWAIT = 100000;  //stop this many cycles after last pkt sent
+const int G_CYCLES_TOSTIM = 500000; //to run this many cycles equal to G_CYCLES_TORUN / G_CYCLES_TORUN us
+const int G_CYCLES_TOWAIT = 50000;  //stop this many cycles after last pkt sent
 const int G_US_TORUN = (G_CYCLES_TOSTIM + G_CYCLES_TOWAIT) / G_FREQ_MHZ;
 
 enum DESC_TYPE
