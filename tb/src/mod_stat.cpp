@@ -9,9 +9,10 @@
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-mod_stat::mod_stat(sc_module_name name):
+mod_stat::mod_stat(sc_module_name name, func_stat *base_top_stat):
     sc_module(name)
 {
+    top_stat = base_top_stat;
     for (int i = 0; i < G_INTER_NUM; i++) {
         in_pkt_stat[i] = new sc_in<s_pkt_desc>();
     }
@@ -70,5 +71,8 @@ void mod_stat::pkt_stat_err_check(s_pkt_desc pkt)
                                 + int(err_list_stat.qid_err_cnt > 0)
                                 + int(err_list_stat.dport_err_cnt > 0);
 
-    MOD_LOG_ERROR << "stat error packet" << err_list_stat;
+    top_stat->record_err_info(err_list_stat);
+    if ((err_list_stat.err_var_sum > 0) || (in_clk_cnt > G_CYCLES_TOSTIM)) {
+        MOD_LOG_ERROR << "stat error packet" << err_list_stat;
+    }
 }

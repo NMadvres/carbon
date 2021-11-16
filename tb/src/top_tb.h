@@ -39,7 +39,7 @@ public:
     {
         //例化 instantiation for module pointers.
         stim_mod = new mod_stim("stim_mod", base_top_stat);
-        stat_mod = new mod_stat("stat_mod");
+        stat_mod = new mod_stat("stat_mod", base_top_stat);
         testctrl_mod = new mod_testctrl("mod_testctrl");
         for (int i = 0; i < G_INTER_NUM; i++) {
             in_pkt_stat[i] = new sc_in<s_pkt_desc>();

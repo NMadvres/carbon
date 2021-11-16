@@ -33,6 +33,7 @@ public:
     sc_fifo<s_pkt_desc> *ing_egr_bcpu_sig; // 用于连接ing和egr
     sc_signal<s_pkt_desc> pe_egr_sig;      // 用于连接ing和sch
     sc_signal<int> pe_sch_fc_sig;          // 用于连接pe和sch,反压信号
+    sc_signal<int> egr_pe_fc_sig;          // 用于连接egr和pe,反压信号
     sc_in<int> in_clk_cnt;                 // 全局时钟计数，用于互联
 
 public: // 例化及互联部分
@@ -66,8 +67,11 @@ public: // 例化及互联部分
         pe_mod->out_cell_que(pe_egr_sig);
         egr_mod->in_port(pe_egr_sig); // 绑定pe和egr
 
-        pe_mod->out_pe_busy(pe_sch_fc_sig); // 绑定pe和egrs
+        //绑定流控信号
+        pe_mod->out_pe_busy(pe_sch_fc_sig); // 绑定pe和sch
         sch_mod->in_fc_port(pe_sch_fc_sig);
+        pe_mod->in_fc_port(egr_pe_fc_sig); // 绑定pe和egr
+        egr_mod->out_egress_busy(egr_pe_fc_sig);
 
         // ing的入口和egr的出口，连线透传到顶层，待更高层进行连接
         for (int i = 0; i < G_INTER_NUM; i++) {

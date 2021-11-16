@@ -20,12 +20,17 @@ public:
 
     void on_recv_cell();
     void on_send_pkt();
+    void rev_fc_process();
 
 public:
     sc_fifo_in<s_pkt_desc> in_cell_que;
     sc_out<s_pkt_desc> out_cell_que;
     sc_in<int> in_clk_cnt;
+
+    //发送流控给sch同时接收egress的流控
     sc_out<int> out_pe_busy;
+    sc_in<int> in_fc_port;
+    int fc_status;
 
 private:
     const int clk_gap;

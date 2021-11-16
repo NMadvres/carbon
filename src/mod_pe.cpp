@@ -16,6 +16,8 @@ mod_pe::mod_pe(sc_module_name name):
     is_busy(false)
 {
     assert(clk_gap > 0);
+    //反压状态赋初值
+    fc_status = 0;
 
     SC_METHOD(on_recv_cell);
     sensitive << in_clk_cnt;
@@ -23,6 +25,10 @@ mod_pe::mod_pe(sc_module_name name):
 
     SC_METHOD(on_send_pkt);
     sensitive << in_clk_cnt;
+    dont_initialize();
+
+    SC_METHOD(rev_fc_process); //反压处理
+    sensitive << in_fc_port;
     dont_initialize();
 }
 
@@ -80,6 +86,11 @@ void mod_pe::on_send_pkt()
     if (pkt_que.empty())
         return;
 
+    //增加一条，如果反压标记为1，返回，不出队
+    if (fc_status == 1) {
+        return;
+    }
+
     s_pkt_desc &pkt = pkt_que.front();
 
     if (g_flow_rule_tab.size() < (unsigned int)pkt.fid) {
@@ -105,5 +116,12 @@ void mod_pe::on_send_pkt()
             is_busy = false;
             MOD_LOG << "send no busy";
         }
+    }
+}
+
+void mod_pe::rev_fc_process()
+{
+    if (in_fc_port.event()) {
+        fc_status = in_fc_port.read();
     }
 }
