@@ -11,9 +11,7 @@
 ////////////////////////////////////////////////////////
 #include "mod_ing.h"
 
-#define mod_ing_print
-
-//#define mod_ing_stat_print
+#define mod_ing_stat_print
 
 mod_ing::mod_ing(sc_module_name name):
     sc_module(name)
@@ -65,9 +63,7 @@ void mod_ing::rev_pkt_process()
                 fifo_port[i].push_back(in_port[i]->read());
                 infifo_count_port[i]++;
             }
-#ifdef mod_ing_print
             MOD_LOG << "ing_in_pkt" << in_port[i]->read();
-#endif
 #ifdef mod_ing_stat_print
             MOD_LOG << "port id:" << i
                     << ", pkts received: " << pkt_count_port[i]
@@ -155,14 +151,16 @@ void mod_ing::pkt_to_cell_process()
             cell_trans.sop = false;
         }
         cell_trans.eop = false;
-        out_cell_que.nb_write(cell_trans);
+
+        if (out_cell_que.num_free() > 0) {
+            out_cell_que.nb_write(cell_trans);
+            MOD_LOG << "ing_out_cell" << cell_trans;
+        } else {
+            MOD_LOG_ERROR << "ing to sch fifo full error!" << cell_trans;
+        }
         pkt_tmp_len -= G_CELL_LEN;
         pkt_head_flag = 0;
         cell_sn++;
-
-#ifdef mod_ing_print
-        MOD_LOG << "ing_out_cell" << cell_trans;
-#endif
 
 #ifdef mod_ing_stat_print
         for (int i = 0; i < G_INTER_NUM; i++) {
@@ -200,16 +198,22 @@ void mod_ing::pkt_to_cell_process()
 
         if (bcpu_flag == 0) {
             cell_trans.type = 1;
-            out_cell_que.nb_write(cell_trans);
-#ifdef mod_ing_print
-            MOD_LOG << "ing_out_cell" << cell_trans;
-#endif
+
+            if (out_cell_que.num_free() > 0) {
+                out_cell_que.nb_write(cell_trans);
+                MOD_LOG << "ing_out_cell" << cell_trans;
+            } else {
+                MOD_LOG_ERROR << "ing to sch fifo full error!" << cell_trans;
+            }
+
         } else {
             cell_trans.type = 0;
-            out_pkt_bcpu.nb_write(cell_trans);
-#ifdef mod_ing_print
-            MOD_LOG << "ing_out_bcpu_pkt" << cell_trans;
-#endif
+            if (out_pkt_bcpu.num_free() > 0) {
+                out_pkt_bcpu.nb_write(cell_trans);
+                MOD_LOG << "ing_out_bcpu_pkt" << cell_trans;
+            } else {
+                MOD_LOG_ERROR << "ing to egr bcpu fifo full error!" << cell_trans;
+            }
         }
 
         pkt_tmp_len = 0;
@@ -221,25 +225,25 @@ void mod_ing::pkt_to_cell_process()
                 dport_pkt_cell_cnt[i]++;
                 dport_pkt_cnt[i]++;
             }
-            MOD_LOG("dport%d_pkt_cnt:%d,dport%d_pkt_cell_cnt:%d", i, dport_pkt_cnt[i], i, dport_pkt_cell_cnt[i]);
+            MOD_LOG << "dport" << i << "_pkt_cnt:" << dport_pkt_cnt[i] << ", dport" << i << "_pkt_cell_cnt:" << dport_pkt_cell_cnt[i] << endl;
         }
         for (int i = 0; i < G_QUE_NUM; i++) {
             if (cell_trans.qid == i) {
                 que_pkt_cell_cnt[i]++;
                 que_pkt_cnt[i]++;
             }
-            MOD_LOG("que%d_pkt_cnt:%d,que%d_pkt_cell_cnt:%d", i, que_pkt_cnt[i], i, que_pkt_cell_cnt[i]);
+            MOD_LOG << "que" << i << "_pkt_cnt:" << que_pkt_cnt[i] << ", que" << i << "_pkt_cell_cnt" << que_pkt_cell_cnt[i] << endl;
         }
         for (int i = 0; i < 16; i++) {
             if (cell_trans.fid == i) {
                 flow_pkt_cell_cnt[i]++;
                 flow_pkt_cnt[i]++;
             }
-            MOD_LOG("flow%d_pkt_cnt:%d,flow%d_pkt_cell_cnt:%d", i, flow_pkt_cnt[i], i, flow_pkt_cell_cnt[i]);
+            MOD_LOG << "flow" << i << "_pkt_cnt:" << flow_pkt_cnt[i] << ", flow" << i << "_pkt_cell_cnt" << flow_pkt_cell_cnt[i] << endl;
         }
         if (cell_trans.dport == 254) {
             bcpu_pkt_cnt++;
-            MOD_LOG("bcpu_pkt_cnt:%d", bcpu_pkt_cnt);
+            MOD_LOG << "bcpu_pkt_cnt:" << bcpu_pkt_cnt;
         }
 
 #endif
