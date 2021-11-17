@@ -21,7 +21,7 @@ mod_stat::mod_stat(sc_module_name name, func_stat *base_top_stat):
     }
     SC_METHOD(recv_pkt_process);
     for (int i = 0; i < G_INTER_NUM; i++) {
-        sensitive << *in_pkt_stat[i];
+        sensitive << *in_pkt_stat[i] << in_bcpu;
     }
     dont_initialize();
 }
@@ -34,7 +34,11 @@ void mod_stat::recv_pkt_process()
         if ((*in_pkt_stat[i]).event()) {
             rd_pkt = in_pkt_stat[i]->read();
             if (rd_pkt.dport != i) err_list_stat.inport_err_cnt++; // check input source inport_err_cnt
+            MOD_LOG_INFO << "stat recv packet " << rd_pkt;
             pkt_stat_err_check(rd_pkt);
+        }
+        if (in_bcpu.event()) {
+            /* dport第五项统计类加这个包的收动作 */
         }
     }
 }
@@ -43,23 +47,26 @@ void mod_stat::pkt_stat_err_check(s_pkt_desc pkt)
 {
     // cache the flow rule table item
     flow_rule = g_flow_rule_tab[pkt.fid];
-    //check fid and update fid_err_cnt
-    if (pkt.fid > int(g_flow_rule_tab.size())) err_list_stat.fid_err_cnt++;
     //check type and update type_err_cnt
     if (pkt.type != DESC_TYPE_PKT) err_list_stat.type_err_cnt++;
-    //check fsn and update fsn_err_cnt
-    if (pkt.fsn != fsn_cache[pkt.fid] + 1) err_list_stat.fsn_err_cnt++;
-    fsn_cache[pkt.fid] = pkt.fsn;
-    //check sid/did/pri and update hash_err_cnt
-    if ((flow_rule.sid != pkt.sid) || (flow_rule.did != pkt.did) || (flow_rule.pri != pkt.pri)) err_list_stat.hash_err_cnt++;
-    //check len and update len_err_cnt
-    if (pkt.len != (flow_rule.len + flow_rule.len2add)) err_list_stat.len_err_cnt++;
-    //check sport and update sport_err_cnt
-    if (pkt.sport != flow_rule.sport) err_list_stat.sport_err_cnt++;
-    //check qid and update qid_err_cnt
-    if (pkt.qid != flow_rule.qid) err_list_stat.qid_err_cnt++;
-    //check dport and update dport_err_cnt
-    if (pkt.dport != flow_rule.dport) err_list_stat.dport_err_cnt++;
+    //check fid and update fid_err_cnt
+    if (pkt.fid > int(g_flow_rule_tab.size()))
+        err_list_stat.fid_err_cnt++;
+    else {
+        //check fsn and update fsn_err_cnt
+        if (pkt.fsn != fsn_cache[pkt.fid] + 1) err_list_stat.fsn_err_cnt++;
+        fsn_cache[pkt.fid] = pkt.fsn;
+        //check sid/did/pri and update hash_err_cnt
+        if ((flow_rule.sid != pkt.sid) || (flow_rule.did != pkt.did) || (flow_rule.pri != pkt.pri)) err_list_stat.hash_err_cnt++;
+        //check len and update len_err_cnt
+        if (pkt.len != (flow_rule.len + flow_rule.len2add)) err_list_stat.len_err_cnt++;
+        //check sport and update sport_err_cnt
+        if (pkt.sport != flow_rule.sport) err_list_stat.sport_err_cnt++;
+        //check qid and update qid_err_cnt
+        if (pkt.qid != flow_rule.qid) err_list_stat.qid_err_cnt++;
+        //check dport and update dport_err_cnt
+        if (pkt.dport != flow_rule.dport) err_list_stat.dport_err_cnt++;
+    }
     //sum up err_var_sum
     err_list_stat.err_var_sum = int(err_list_stat.inport_err_cnt > 0)
                                 + int(err_list_stat.fid_err_cnt > 0)
