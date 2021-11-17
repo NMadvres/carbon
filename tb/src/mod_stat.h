@@ -23,6 +23,7 @@ public:
     sc_in<int> in_clk_cnt;
     sc_in<s_pkt_desc> in_bcpu;
     void recv_pkt_process();
+    void recv_bcpu_pkt_process();
     void pkt_stat_err_check(s_pkt_desc pkt);
     func_stat *top_stat;
     s_flow_rule flow_rule;

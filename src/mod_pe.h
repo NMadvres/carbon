@@ -27,11 +27,6 @@ public:
     sc_out<s_pkt_desc> out_cell_que;
     sc_in<int> in_clk_cnt;
 
-    //发送流控给sch同时接收egress的流控
-    sc_out<int> out_pe_busy;
-    sc_in<int> in_fc_port;
-    int fc_status;
-
 private:
     const int clk_gap;
     int clk_wait;
