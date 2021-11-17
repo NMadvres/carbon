@@ -157,7 +157,8 @@ void mod_stim::stim_prc()
 
     wait(1);
     while (1) {
-        while (in_clk_cnt > G_CYCLES_TOSTIM) wait(); //stop after G_CYCLES_TOSTIM cycles
+        if (in_clk_cnt > G_CYCLES_TOSTIM) return; //stop
+
         if (token_count < G_FREQ_MHZ) {
             token_count++;
         } else {

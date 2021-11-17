@@ -15,7 +15,11 @@ mod_egr::mod_egr(sc_module_name name, func_stat *base_top_stat):
     //for stat
     top_stat = base_top_stat;
     cycle_cnt = 0;
-    is_busy = false;
+    out_egress_busy.resize(G_INTER_NUM);
+    for (int i = 0; i < G_INTER_NUM; i++) {
+        out_egress_busy[i] = new sc_out<int>();
+    }
+    is_busy.resize(G_INTER_NUM, 0);
 
     for (int i = 0; i < G_INTER_NUM; i++) {
         out_port[i] = new sc_out<s_pkt_desc>();
@@ -101,9 +105,9 @@ void mod_egr::send_pkt_process()
     //流控状态判断
     for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
         if (fifo_port[port_id].size() >= 50) {
-            if (is_busy == false) {
-                is_busy = true;
-                out_egress_busy.write(1);
+            if (is_busy[port_id] == 0) {
+                is_busy[port_id] = 1;
+                out_egress_busy[port_id]->write(1);
                 MOD_LOG << "Egress generate flow ctrl to PE";
             }
         }
@@ -133,9 +137,9 @@ void mod_egr::send_pkt_process()
 
         //流控状态判断
         if (fifo_port[port_id].size() < 50) {
-            if (is_busy == true) {
-                is_busy = false;
-                out_egress_busy.write(0);
+            if (is_busy[port_id] == 1) {
+                is_busy[port_id] = 0;
+                out_egress_busy[port_id]->write(0);
                 MOD_LOG << "Egress cancel flow ctrl to PE" << pkt;
             }
         }

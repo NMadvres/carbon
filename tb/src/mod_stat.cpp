@@ -21,8 +21,12 @@ mod_stat::mod_stat(sc_module_name name, func_stat *base_top_stat):
     }
     SC_METHOD(recv_pkt_process);
     for (int i = 0; i < G_INTER_NUM; i++) {
-        sensitive << *in_pkt_stat[i] << in_bcpu;
+        sensitive << *in_pkt_stat[i];
     }
+    dont_initialize();
+    //for bcpu stat
+    SC_METHOD(recv_bcpu_pkt_process);
+    sensitive << in_bcpu;
     dont_initialize();
 }
 
@@ -34,12 +38,18 @@ void mod_stat::recv_pkt_process()
         if ((*in_pkt_stat[i]).event()) {
             rd_pkt = in_pkt_stat[i]->read();
             if (rd_pkt.dport != i) err_list_stat.inport_err_cnt++; // check input source inport_err_cnt
-            MOD_LOG_INFO << "stat recv packet " << rd_pkt;
             pkt_stat_err_check(rd_pkt);
         }
-        if (in_bcpu.event()) {
-            /* dport第五项统计类加这个包的收动作 */
-        }
+    }
+}
+
+void mod_stat::recv_bcpu_pkt_process()
+{
+    if (in_bcpu.event()) {
+        s_pkt_desc rd_pkt;
+        rd_pkt = in_bcpu.read();
+        //for stat output bw
+        top_stat->input_comm_stat_func(rd_pkt);
     }
 }
 

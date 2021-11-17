@@ -421,6 +421,10 @@ func_stat_base::func_stat_base(string file_name, MODULE_TYPE mod_name, Stat_BASE
 ////////////////////////////////////////////////////////
 void func_stat_base::input_record_bw_info(int que_id, int valid_len, int is_eop)
 {
+    //for bcpu
+    if (que_id == 254) {
+        que_id = G_INTER_NUM;
+    }
     if (!is_eop) {
         input_que_pktlen_stat[que_id] += valid_len;
     } else {
@@ -550,7 +554,7 @@ func_stat::func_stat(string file_name, MODULE_TYPE base_mod_name)
     que_stat = new func_stat_base(g_file_name, mod_name, que_level, que_size);
     pri_stat = new func_stat_base(g_file_name, mod_name, pri_level, pri_size);
     sport_stat = new func_stat_base(g_file_name, mod_name, sport_level, port_size);
-    dport_stat = new func_stat_base(g_file_name, mod_name, dport_level, port_size);
+    dport_stat = new func_stat_base(g_file_name, mod_name, dport_level, port_size + 1); //stat 增加一个BCPU报文端口
 }
 void func_stat::check_enable_level(s_pkt_desc &pkt_stat)
 {
@@ -559,6 +563,12 @@ void func_stat::check_enable_level(s_pkt_desc &pkt_stat)
     fid_enable_flag = 0;
     que_enable_flag = 0;
     pri_enable_flag = 0;
+    //如果是dport 254，只使能dport统计，退出
+    if (pkt_stat.dport == 254) {
+        dport_enable_flag = 1;
+        return;
+    }
+
     if (pkt_stat.sport != -1) {
         sport_enable_flag = 1;
     }
