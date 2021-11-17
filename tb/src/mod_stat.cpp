@@ -48,6 +48,7 @@ void mod_stat::recv_bcpu_pkt_process()
     if (in_bcpu.event()) {
         s_pkt_desc rd_pkt;
         rd_pkt = in_bcpu.read();
+        pkt_stat_err_check(rd_pkt);
         //for stat output bw
         top_stat->input_comm_stat_func(rd_pkt);
     }
