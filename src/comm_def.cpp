@@ -505,6 +505,13 @@ void func_stat_base::print_info(int stat_period)
         if (drop_que_pktnum_stat[i] == 0) {
             drop_que_pktnum_stat[i] = output_que_pktnum_stat[i] - input_que_pktnum_stat[i];
         }
+        //针对BCPU报文，单独处理
+        if (strcmp(pre_print_name.c_str(), "dport") == 0) {
+            if (i == G_INTER_NUM) {
+                drop_que_pktnum_stat[i] = 0;
+            }
+        }
+
         dpd_pkts = drop_que_pktnum_stat[i];                                    // drop packet
         dpd_mpps = (double)drop_que_pktnum_stat[i] * G_FREQ_MHZ / stat_period; // drop_Mpps
         avg_dly = record_avg_delay[i];
