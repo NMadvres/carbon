@@ -12,17 +12,17 @@
 mod_sch::mod_sch(sc_module_name name):
     sc_module(name)
 {
+    //SCH relate
     input_drop_flag.resize(G_INTER_NUM);
     input_cell_que.resize(G_INTER_NUM);
-    wrr_sch.resize(G_INTER_NUM);
     que_status.resize(G_INTER_NUM);
-    input_sp_que.resize(G_PRI_NUM);
+    input_wrr_que.resize(G_QUE_NUM);
     for (int i = 0; i < G_INTER_NUM; i++) {
-        input_drop_flag[i].resize(G_QUE_NUM, 0);
-        input_cell_que[i].resize(G_QUE_NUM);
-        que_status[i].resize(G_QUE_NUM, 0);
-        wrr_sch[i] = new WRR_SCH(G_QUE_NUM, g_que_rule_tab);
+        input_drop_flag[i].resize(G_PRI_NUM, 0);
+        input_cell_que[i].resize(G_PRI_NUM);
+        que_status[i].resize(G_PRI_NUM, 0);
     }
+    wrr_sch = new WRR_SCH(G_QUE_NUM, g_que_rule_tab);
     //input_drop_flag.resize(G_QUE_NUM, 0);
     //反压状态赋初值
     in_fc_port.resize(G_INTER_NUM);
@@ -77,34 +77,37 @@ void mod_sch::rev_pkt_process()
         if (que_id < 0) {
             continue;
         }
+
+        //换算队列
+        int pri_id = que_id % G_PRI_NUM;
         //增加状态判断，确定是否处于丢弃状态，对于SOP切片判断，如需丢弃则flag拉起;9600/64=150.需要设置成150个
         MOD_LOG << "cur_cycle" << g_cycle_cnt << "   recv ing packet " << rd_pkt << "que size" << input_cell_que[que_id].size();
         if (rd_pkt.sop) {
-            if (input_drop_flag[dport_id][que_id] == 0) {
-                if (input_cell_que[dport_id][que_id].size() > 300) {
-                    input_drop_flag[dport_id][que_id] = 1;
+            if (input_drop_flag[dport_id][pri_id] == 0) {
+                if (input_cell_que[dport_id][pri_id].size() > 1000) {
+                    input_drop_flag[dport_id][pri_id] = 1;
                 } else {
-                    input_drop_flag[dport_id][que_id] = 0;
+                    input_drop_flag[dport_id][pri_id] = 0;
                 }
             }
-            if (input_drop_flag[dport_id][que_id] == 1) {
-                if (input_cell_que[dport_id][que_id].size() > 300) {
-                    input_drop_flag[dport_id][que_id] = 1;
+            if (input_drop_flag[dport_id][pri_id] == 1) {
+                if (input_cell_que[dport_id][pri_id].size() > 1000) {
+                    input_drop_flag[dport_id][pri_id] = 1;
                 } else {
-                    input_drop_flag[dport_id][que_id] = 0;
+                    input_drop_flag[dport_id][pri_id] = 0;
                 }
             }
         }
 
         //如不丢弃则写入
-        if (input_drop_flag[dport_id][que_id] == 0) {
-            input_cell_que[dport_id][que_id].push_back(rd_pkt);
+        if (input_drop_flag[dport_id][pri_id] == 0) {
+            input_cell_que[dport_id][pri_id].push_back(rd_pkt);
         } else {
             MOD_LOG << "cur_cycle" << g_cycle_cnt << "  drop packet" << rd_pkt;
         }
 
-        if (input_cell_que[dport_id][que_id].size() > 500) {
-            MOD_LOG << "input_cell_que overflow size:" << input_cell_que[dport_id][que_id].size();
+        if (input_cell_que[dport_id][pri_id].size() > 2000) {
+            MOD_LOG << "input_cell_que overflow size:" << input_cell_que[dport_id][pri_id].size();
             ASSERT(0);
         }
     }
@@ -121,48 +124,45 @@ void mod_sch::rev_pkt_process()
 ////////////////////////////////////////////////////////
 void mod_sch::sch_pkt_process()
 {
-    //轮询
+    //SP 调度，调度成功后发给第二级WRR调度器
     for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
-        for (int que_id = 0; que_id < G_QUE_NUM; que_id++) {
-            check_wrr_que_status(port_id, que_id);
-            if (que_status[port_id][que_id] == 1) {
-                wrr_sch[port_id]->set_que_valid(que_id, 1);
-            } else {
-                wrr_sch[port_id]->set_que_valid(que_id, 0);
+        for (int pri_id = 0; pri_id < G_PRI_NUM; pri_id++) {
+            check_firsch_que_status(port_id, pri_id);
+            if (que_status[port_id][pri_id] == 1) {
+                send_cell_to_secsch_que(port_id, pri_id);
+                break;
             }
         }
     }
 
-    //WRR 调度,如果可以选中，则持续发送该队列切片，直到发送到EOP为止
-    for (int port_id = 0; port_id < G_INTER_NUM; port_id++) {
-        int rst_que = -1;
-        bool rst_flag = false;
-        rst_flag = wrr_sch[port_id]->get_sch_result(rst_que);
-        if (rst_flag == true) {
-            send_cell_to_sp_que(port_id, rst_que);
-            check_wrr_que_status(port_id, rst_que);
+    //轮询
+
+    for (int que_id = 0; que_id < G_QUE_NUM; que_id++) {
+        if (input_wrr_que[que_id].size() > 0) {
+            wrr_sch->set_que_valid(que_id, 1);
+        } else {
+            wrr_sch->set_que_valid(que_id, 0);
         }
     }
 
-    //SP 调度，如果可以选中，则持续发送该队列切片，直到发送到EOP为止
-    for (int pri_id = 0; pri_id < G_PRI_NUM; pri_id++) {
-        if (input_sp_que[pri_id].size() > 0) {
-            //一定是整包的基于整包调度
-            send_cell_to_pe(pri_id);
-            break;
-        }
+    //WRR 调度,如果可以选中，则持续发送该队列切片到PE，直到发送到EOP为止
+    int rst_que = -1;
+    bool rst_flag = false;
+    rst_flag = wrr_sch->get_sch_result(rst_que);
+    if (rst_flag == true) {
+        send_cell_to_pe(rst_que);
     }
 }
 ////////////////////////////////////////////////////////
 // Project： SystemC虚拟项目
 // Module:   mod_sch
-// Description: 刷新队列状态，对WRR队列进行刷新
+// Description: 刷新队列状态，对SP队列进行刷新
 // Group：预研组
 // Author: Newton
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-void mod_sch::check_wrr_que_status(int port_id, int que_id)
+void mod_sch::check_firsch_que_status(int port_id, int que_id)
 {
     if (fc_status[port_id] == 1) {
         que_status[port_id][que_id] = 0;
@@ -194,14 +194,14 @@ void mod_sch::check_wrr_que_status(int port_id, int que_id)
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-void mod_sch::send_cell_to_sp_que(int port_id, int que_id)
+void mod_sch::send_cell_to_secsch_que(int port_id, int que_id)
 {
     int cell_num = input_cell_que[port_id][que_id].size();
     for (int i = 0; i < cell_num; i++) {
         s_pkt_desc cur_cell = input_cell_que[port_id][que_id].front();
         input_cell_que[port_id][que_id].pop_front();
-        int pri_id = cur_cell.pri;
-        input_sp_que[pri_id].push_back(cur_cell);
+        int next_que = cur_cell.qid;
+        input_wrr_que[next_que].push_back(cur_cell);
 
         if (cur_cell.eop == true) {
             break;
@@ -218,12 +218,12 @@ void mod_sch::send_cell_to_sp_que(int port_id, int que_id)
 // Date: 2021.10.14 第一版
 // Hierarchy : 编号，索引公共库
 ////////////////////////////////////////////////////////
-void mod_sch::send_cell_to_pe(int pri_id)
+void mod_sch::send_cell_to_pe(int que_id)
 {
-    int cell_num = input_sp_que[pri_id].size();
+    int cell_num = input_wrr_que[que_id].size();
     for (int i = 0; i < cell_num; i++) {
-        s_pkt_desc cur_cell = input_sp_que[pri_id].front();
-        input_sp_que[pri_id].pop_front();
+        s_pkt_desc cur_cell = input_wrr_que[que_id].front();
+        input_wrr_que[que_id].pop_front();
         //增加时戳信息
         cur_cell.time_stamp.sch_out_clock = g_cycle_cnt;
         out_cell_que.nb_write(cur_cell);
